@@ -7,9 +7,9 @@ using UnityEngine.AI;
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private GameObject _prefab;
-    [SerializeField] private float _spawnDistanceMax;
-    [SerializeField] private float _spawnDistanceMin;
-    [SerializeField] private float _spawnAmount;
+    [SerializeField] [Range(0, 1000)] private float _spawnDistanceMax;
+    [SerializeField] [Range(5, 100)] private float _spawnDistanceMin;
+    [SerializeField] [Range(0, 100)] private int _spawnAmount;
 
     [SerializeField] [Range(0, 1)] private float _gizmosOpacity = 0.5f;
 
@@ -25,15 +25,19 @@ public class Spawner : MonoBehaviour
     {
         for (int i = 0; i < _spawnAmount; i++)
         {
-            GameObject agent = Instantiate(_prefab);
             Vector2 randomLocation = Random.insideUnitCircle;
             float randomDistance = Random.Range(_spawnDistanceMin, _spawnDistanceMax);
 
-            agent.transform.position = new Vector3(
+            Vector3 spawnPosition = new Vector3(
                 transform.position.x + (randomLocation.x * randomDistance), 
                 transform.position.y,
                 transform.position.z + (randomLocation.y * randomDistance)
                 );
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(spawnPosition, out hit, 100f, NavMesh.AllAreas)){
+                Instantiate(_prefab, hit.position, Quaternion.identity);
+            }
         }
     }
 

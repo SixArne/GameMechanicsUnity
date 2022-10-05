@@ -19,6 +19,8 @@ public class AgentCharacter : NPCCharacter
 
     [SerializeField] private AgentState _agentState = AgentState.Wander;
     [SerializeField] private float _wanderDistance = 5f;
+    [SerializeField] private float _reachedDestination = 5f;
+    [SerializeField] private bool _isScared = false;
 
     private bool _hasReachedDestination = false;
     private Vector3 _wanderDestination = Vector3.zero;
@@ -37,9 +39,13 @@ public class AgentCharacter : NPCCharacter
     {
         var player = Physics.OverlapSphere(transform.position, _detectionRadius, _layerMask);
         
-        if (player.Length > 0)
+        if (player.Length > 0 && _isScared)
         {
             _agentState = AgentState.Flee;
+        }
+        else if (player.Length > 0)
+        {
+            _agentState = AgentState.Follow;
         }
         else
         {
@@ -54,6 +60,10 @@ public class AgentCharacter : NPCCharacter
                 // Calculate different wander point
                 CalculateWanderDestination();
                 break;
+            case AgentState.Follow:
+                Follow(player[0].gameObject.transform.position);
+                break;
+
             case AgentState.Wander:
                 Wander();
                 break;
@@ -63,7 +73,15 @@ public class AgentCharacter : NPCCharacter
 
     public void Follow(Vector3 position)
     {
-        
+        if (Vector3.Distance(position, transform.position) <= _reachedDestination)
+        {
+            _agent.isStopped = true;
+        }
+        else
+        {
+            _agent.isStopped = false;
+            _agent.SetDestination(position);
+        }
     }
 
     private void Wander()
@@ -74,7 +92,7 @@ public class AgentCharacter : NPCCharacter
             CalculateWanderDestination();
         }
 
-        if (Vector3.Distance(_wanderDestination, transform.position) <= 2f)
+        if (Vector3.Distance(_wanderDestination, transform.position) <= _reachedDestination)
         {
             _hasReachedDestination = true;
         }
@@ -85,18 +103,16 @@ public class AgentCharacter : NPCCharacter
     private void CalculateWanderDestination()
     {
         Vector2 randomDirection = Random.insideUnitCircle;
-        _wanderDestination = new Vector3(
+        Vector3 randomWanderLocation = new Vector3(
             transform.position.x + randomDirection.x * _wanderDistance, 
             transform.position.y,
             transform.position.z + randomDirection.y * _wanderDistance
             );
 
-        NavMeshHit hit;
-        bool findClosestEdge = _agent.FindClosestEdge(out hit);
-
-        if (findClosestEdge)
+        NavMeshHit navMeshHit;
+        if (NavMesh.SamplePosition(randomWanderLocation, out navMeshHit, 100f, NavMesh.AllAreas))
         {
-            _wanderDestination = hit.position;
+            _wanderDestination = navMeshHit.position;
         }
     }
 
@@ -110,6 +126,9 @@ public class AgentCharacter : NPCCharacter
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, _detectionRadius);
+
+        Gizmos.color = Color.magenta.WithAlpha(0.4f);
+        Gizmos.DrawSphere(transform.position, _reachedDestination);
 
         Gizmos.DrawSphere(_wanderDestination, 2f);
     }
