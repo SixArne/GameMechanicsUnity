@@ -8,7 +8,7 @@ public class Spawner : MonoBehaviour
 {
     [SerializeField] private GameObject _prefab;
     [SerializeField] [Range(0, 1000)] private float _spawnDistanceMax;
-    [SerializeField] [Range(5, 100)] private float _spawnDistanceMin;
+    [SerializeField] [Range(0, 100)] private float _spawnDistanceMin;
     [SerializeField] [Range(0, 100)] private int _spawnAmount;
 
     [SerializeField] [Range(0, 1)] private float _gizmosOpacity = 0.5f;
@@ -19,9 +19,11 @@ public class Spawner : MonoBehaviour
 
         if (navMeshComp == null)
             throw new UnityException("NO NAVMESH COMPONENT FOUND");
+
+        SpawnEntities();
     }
 
-    void Start()
+    void SpawnEntities()
     {
         for (int i = 0; i < _spawnAmount; i++)
         {
@@ -43,7 +45,7 @@ public class Spawner : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow.WithAlpha(_gizmosOpacity);
+        Gizmos.color = new Color(1, 1, 0, _gizmosOpacity);
         Gizmos.DrawSphere(transform.position, _spawnDistanceMax);
     }
 }
