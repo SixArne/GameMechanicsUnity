@@ -5,33 +5,48 @@ using System.IO.Compression;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.XR;
 
 public class AwarenessBehavior : MonoBehaviour
 {
-    [SerializeField] private GameObject _killImage;
-    [SerializeField] private GameObject _followImage;
-    [SerializeField] private float _agentInteractRadius = 3f;
+    [SerializeField] private Image _killImage;
+    [SerializeField] private Image _followImage;
+    [SerializeField] private float _agentInteractRadius = 5f;
     [SerializeField] private float _crimeRayLength = 5f;
-    [SerializeField] private bool _canKill = true;
-    [SerializeField] private bool _canFollow = true;
     [SerializeField] private LayerMask _playerMask;
+    [SerializeField] private Material _agentDeathMaterial;
+
+
+    const string _playerTag = "Friendly";
 
     private GameObject _player;
     private bool _canInteract = false;
+    private bool _canKill = true;
+    private bool _isFollowing = false;
+    private bool _isDead = false;
 
-    public bool CanFollow
+    public bool IsFollowing
     {
-        get { return _canFollow; }
-        set { _canFollow = value; }
+        get => _isFollowing;
+        set => _isFollowing = value;
+    }
+
+    public bool CanKill
+    {
+        get => _canKill;
+        set => _canKill = value;
+    }
+
+    public bool IsDead
+    {
+        get => _isDead;
+        set => _isDead = value;
     }
 
     void Start()
     {
-        _player = GameObject.FindGameObjectWithTag("Friendly");
+        _player = GameObject.FindGameObjectWithTag(_playerTag);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!_player)
@@ -45,8 +60,31 @@ public class AwarenessBehavior : MonoBehaviour
             _canInteract = true;
         }
 
-        _killImage.SetActive(_canKill && _canInteract);
-        _followImage.SetActive(_canFollow && _canInteract);
+        if (!_canKill && _canInteract || _isDead)
+        {
+            _killImage.color = new Color(1, 0, 0, .5f);
+        }
+        else if (_canInteract)
+        {
+            _killImage.color = new Color(1, 1, 1, 1);
+        }
+        else
+        {
+            _killImage.color = new Color(1, 1, 1, 0);
+        }
+
+        if (_isDead || _isFollowing)
+        {
+            _followImage.color = new Color(1, 1, 1, .5f);
+        }
+        else if (!_isFollowing && _canInteract)
+        {
+            _followImage.color = new Color(1, 1, 1, 1f);
+        }
+        else
+        {
+            _followImage.color = new Color(1, 1, 1, 0);
+        }
 
         DetectCrime();
     }

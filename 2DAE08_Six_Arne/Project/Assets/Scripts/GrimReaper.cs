@@ -17,15 +17,23 @@ public class GrimReaper : BasicNavMeshAgent
     [SerializeField] private float _collectDuration = 5f;
     [SerializeField] private float _killRadius = 5f;
 
+    const string _playerTag = "Friendly";
 
     private GameObject _player;
     private float _currentTimer = 0f;
+    private PlayerCharacter _playerCharacter;
+
+    private bool _canKillPlayer = true;
 
     protected override void Awake()
     {
         base.Awake();
 
-        _player = GameObject.FindGameObjectWithTag("Friendly");
+        _player = GameObject.FindGameObjectWithTag(_playerTag);
+        _playerCharacter = _player.GetComponent<PlayerCharacter>();
+
+        if (!_player)
+            throw new UnityException("No player found");
     }
 
     private void Update()
@@ -44,9 +52,11 @@ public class GrimReaper : BasicNavMeshAgent
         }
 
         Vector3 transformPosition = _player.transform.position - transform.position;
-        if (transformPosition.sqrMagnitude <= _killRadius * _killRadius)
+        if (transformPosition.sqrMagnitude <= _killRadius * _killRadius && _canKillPlayer)
         {
-            Destroy(_player);
+            _canKillPlayer = false;
+            _playerCharacter.DestroyPlayer();
+
             _state = GrimState.Collecting;
         }
     }

@@ -127,7 +127,10 @@ public class PlayerCharacter : BasicCharacter
 
     public void DestroyPlayer()
     {
-        _deathParticle.Play();
-        Destroy(gameObject, .2f);
+        Instantiate(_deathParticle, transform);
+
+        // set active to let animation play out
+        gameObject.SetActive(false);
+        Destroy(gameObject, 2f);
     }
 }

@@ -24,6 +24,7 @@ public class AgentCharacter : BasicNavMeshAgent
     private bool _isMarkedForKilling = false;
     private bool _isDead = false;
     private bool _hasSeenCrime = false;
+    private bool _isReaped = false;
     private bool _isTurningBlindEye = false;
 
     private AwarenessBehavior _awarenessBehavior = null;
@@ -71,6 +72,12 @@ public class AgentCharacter : BasicNavMeshAgent
         }
     }
 
+    public bool IsReaped
+    {
+        get => _isReaped;
+        set => _isReaped = value;
+    }
+
     void Start()
     {
         CalculateWanderDestination();
@@ -91,8 +98,8 @@ public class AgentCharacter : BasicNavMeshAgent
             // set to prevent entering this again
             _isDead = true;
             _Visuals.GetComponent<MeshRenderer>().material = _DeathMaterial;
-            
-            _DeathParticle.Play();
+
+            Instantiate(_DeathParticle, transform);
         }
         else if (_isFollowing && _player)
         {

@@ -10,11 +10,19 @@ public class CameraBehavior : MonoBehaviour
     [SerializeField]
     private float _followSpeed = 5.0f;
 
-    void LateUpdate()
+    [SerializeField]
+    private Vector3 _offset = Vector3.zero;
+
+    void Start()
+    {
+        transform.LookAt(_player.transform.position);    
+    }
+
+    void Update()
     {
         if (_player != null)
         {
-            transform.position = Vector3.Lerp(transform.position, _player.transform.position, _followSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, _player.transform.position + _offset, _followSpeed * Time.deltaTime);
         }
     }
 }

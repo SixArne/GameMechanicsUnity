@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Ground
   - StaticLevel
+  - Agent
   layers:
   - Default
   - TransparentFX
