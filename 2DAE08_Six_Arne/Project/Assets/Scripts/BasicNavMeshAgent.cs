@@ -19,8 +19,7 @@ public class BasicNavMeshAgent : MonoBehaviour
     [Header("Arrive")]
     [SerializeField] protected float _arriveDistance = 2f;
 
-    [Header("State")]
-    [SerializeField] protected AgentState _agentStatus = AgentState.Wander;
+    protected AgentState _agentStatus = AgentState.Wander;
 
     [Header("Target movement")]
     [SerializeField] protected MovementBehavior _targetMovement;

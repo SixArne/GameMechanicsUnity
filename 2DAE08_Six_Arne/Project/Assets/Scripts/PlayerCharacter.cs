@@ -108,11 +108,12 @@ public class PlayerCharacter : BasicCharacter
                 AgentCharacter agentCharacter = collider.gameObject.GetComponentInParent<AgentCharacter>();
 
                 // Exit out early if agent is already dead.
-                if (agentCharacter.IsMarkedForKilling)
+                if (agentCharacter.State == AgentCharacter.AgentState.Dead)
                     return;
 
                 if (hasPressedKill && _canKill)
                 {
+                    agentCharacter.State = AgentCharacter.AgentState.Dead;
                     agentCharacter.IsMarkedForKilling = true;
                     _canKill = false;
 
@@ -120,14 +121,28 @@ public class PlayerCharacter : BasicCharacter
                 }
 
                 if (hasPressedFollow)
+                {
+                    if (agentCharacter.State == AgentCharacter.AgentState.Follow)
+                    {
+                        agentCharacter.State = AgentCharacter.AgentState.Wander;
+                    }
+                    else
+                    {
+                        agentCharacter.State = AgentCharacter.AgentState.Follow;
+                    }
+
                     agentCharacter.IsFollowing = !agentCharacter.IsFollowing;
+                }
             }
         }
     }
 
     public void DestroyPlayer()
     {
-        _deathParticle.Play();
-        Destroy(gameObject, .2f);
+        Instantiate(_deathParticle, transform.position, transform.rotation);
+
+        // set active to let animation play out
+        gameObject.SetActive(false);
+        Destroy(gameObject, 2f);
     }
 }

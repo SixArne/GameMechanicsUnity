@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GrimReaper : BasicNavMeshAgent
 {
-    enum GrimState
+    public enum GrimState
     {
         Collecting,
         Chasing,
@@ -15,7 +15,11 @@ public class GrimReaper : BasicNavMeshAgent
     [Header("Grim")]
     [SerializeField] private GrimState _state = GrimState.Collecting;
     [SerializeField] private float _collectDuration = 5f;
+    [SerializeField] private float _collectRadius = 3f;
     [SerializeField] private float _killRadius = 5f;
+
+    [Header("SceneManager")]
+    [SerializeField] private SceneManager _sceneManager = null;
 
     const string _playerTag = "Friendly";
 
@@ -24,6 +28,19 @@ public class GrimReaper : BasicNavMeshAgent
     private PlayerCharacter _playerCharacter;
 
     private bool _canKillPlayer = true;
+    private GameObject _deadAgent = null;
+
+    public GrimState State
+    {
+        get => _state;
+        set => _state = value;
+    }
+
+    public GameObject DeadAgent
+    {
+        get => _deadAgent;
+        set => _deadAgent = value;
+    }
 
     protected override void Awake()
     {
@@ -31,6 +48,7 @@ public class GrimReaper : BasicNavMeshAgent
 
         _player = GameObject.FindGameObjectWithTag(_playerTag);
         _playerCharacter = _player.GetComponent<PlayerCharacter>();
+        _sceneManager = GameObject.FindObjectOfType<SceneManager>();
 
         if (!_player)
             throw new UnityException("No player found");
@@ -57,18 +75,46 @@ public class GrimReaper : BasicNavMeshAgent
             _canKillPlayer = false;
             _playerCharacter.DestroyPlayer();
 
+
+            Invoke("EndGame", 0.5f);
+
             _state = GrimState.Collecting;
         }
+    }
+    
+    private void EndGame()
+    {
+        _sceneManager.MenuScene();
     }
 
     private void CollectSoul()
     {
-        _currentTimer += Time.deltaTime;
+        if (!_deadAgent)
+            return;
 
-        if (_currentTimer > _collectDuration)
+        float distanceSqr = Vector3.SqrMagnitude(_deadAgent.gameObject.transform.position - transform.position);
+
+        if (distanceSqr <= _collectRadius * _collectRadius)
         {
-            _state = GrimState.Chasing;
-            _currentTimer = 0f;
+            _currentTimer += Time.deltaTime;
+
+            if (_currentTimer > _collectDuration)
+            {
+                _state = GrimState.Chasing;
+                _deadAgent.GetComponent<AgentCharacter>().IsReaped = true;
+                _currentTimer = 0f;
+
+                // Make hein bit faster
+                _agent.speed += 10f;
+
+                Destroy(_deadAgent);
+            }
+        }
+        else
+        {
+            // Set location data.
+            Target = _deadAgent.gameObject.transform.position;
+            base.Seek();
         }
     }
 
@@ -80,10 +126,16 @@ public class GrimReaper : BasicNavMeshAgent
 
     protected override void OnDrawGizmos()
     {
-        // Drawing steering behaviour
+        // Drawing steering behavior
         base.OnDrawGizmos();
 
         Gizmos.color = new Color(1, 0, 0, 0.4f);
         Gizmos.DrawSphere(transform.position, _killRadius);
+
+        if (_deadAgent)
+        {
+            Gizmos.color = new Color(0, 1, 1, 0.5f);
+            Gizmos.DrawSphere(_deadAgent.gameObject.transform.position, _collectRadius);
+        }   
     }
 }

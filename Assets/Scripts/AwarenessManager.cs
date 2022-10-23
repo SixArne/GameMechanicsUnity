@@ -83,7 +83,7 @@ public class AwarenessManager : MonoBehaviour
 
         foreach (AgentCharacter agent in _agents)
         {
-            if (agent.IsMarkedForKilling && !agent.IsReaped)
+            if (agent.State == AgentCharacter.AgentState.Dead && !agent.IsReaped)
             {
                 _reaper.State = GrimReaper.GrimState.Collecting;
                 _reaper.DeadAgent = agent.gameObject;

@@ -18,6 +18,9 @@ public class GrimReaper : BasicNavMeshAgent
     [SerializeField] private float _collectRadius = 3f;
     [SerializeField] private float _killRadius = 5f;
 
+    [Header("SceneManager")]
+    [SerializeField] private SceneManager _sceneManager = null;
+
     const string _playerTag = "Friendly";
 
     private GameObject _player;
@@ -45,6 +48,7 @@ public class GrimReaper : BasicNavMeshAgent
 
         _player = GameObject.FindGameObjectWithTag(_playerTag);
         _playerCharacter = _player.GetComponent<PlayerCharacter>();
+        _sceneManager = GameObject.FindObjectOfType<SceneManager>();
 
         if (!_player)
             throw new UnityException("No player found");
@@ -71,8 +75,16 @@ public class GrimReaper : BasicNavMeshAgent
             _canKillPlayer = false;
             _playerCharacter.DestroyPlayer();
 
+
+            Invoke("EndGame", 0.5f);
+
             _state = GrimState.Collecting;
         }
+    }
+    
+    private void EndGame()
+    {
+        _sceneManager.MenuScene();
     }
 
     private void CollectSoul()

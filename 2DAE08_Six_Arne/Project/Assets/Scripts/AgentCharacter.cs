@@ -13,6 +13,7 @@ public class AgentCharacter : BasicNavMeshAgent
     [SerializeField] private Material _DeathMaterial;
     [SerializeField] readonly private float _wanderMaxCooldown = 5f;
     [SerializeField] private float _blindEyeCooldown = 15f;
+    [SerializeField] AgentState _state = AgentState.Wander;
 
     private bool _hasReachedDestination = false;
     private Vector3 _wanderDestination = Vector3.zero;
@@ -24,9 +25,18 @@ public class AgentCharacter : BasicNavMeshAgent
     private bool _isMarkedForKilling = false;
     private bool _isDead = false;
     private bool _hasSeenCrime = false;
+    private bool _isReaped = false;
     private bool _isTurningBlindEye = false;
 
     private AwarenessBehavior _awarenessBehavior = null;
+
+    public enum AgentState
+    {
+        Wander,
+        Idle,
+        Follow,
+        Dead,
+    }
 
     protected override void Awake()
     {
@@ -71,6 +81,18 @@ public class AgentCharacter : BasicNavMeshAgent
         }
     }
 
+    public bool IsReaped
+    {
+        get => _isReaped;
+        set => _isReaped = value;
+    }
+
+    public AgentState State
+    {
+        get => _state;
+        set => _state = value;
+    }
+
     void Start()
     {
         CalculateWanderDestination();
@@ -80,28 +102,30 @@ public class AgentCharacter : BasicNavMeshAgent
     {
         HandleCoolDowns();
 
-        if (_isMarkedForKilling && !_isDead)
+        if (_isMarkedForKilling && _state == AgentState.Dead)
         {
-            // FIX THIS SHIT LATER todo:
-
-
             // stop agent and mark as dead.
             _agent.isStopped = true;
 
             // set to prevent entering this again
             _isDead = true;
+            _state = AgentState.Dead;
+
+            // unmark to prevent looping animation
+            _isMarkedForKilling = false;
+
             _Visuals.GetComponent<MeshRenderer>().material = _DeathMaterial;
-            
-            _DeathParticle.Play();
+
+            Instantiate(_DeathParticle, transform);
         }
-        else if (_isFollowing && _player)
+        else if (_state == AgentState.Follow && _player)
         {
             Target = _player.transform.position;
             Seek();
 
             return;
         }
-        else
+        else if (_state == AgentState.Wander)
         {
             Wander();
         }
@@ -144,7 +168,7 @@ public class AgentCharacter : BasicNavMeshAgent
     {
         Vector2 randomDirection = Random.insideUnitCircle;
         Vector3 randomWanderLocation = new Vector3(
-            transform.position.x + randomDirection.x * _wanderDistance, 
+            transform.position.x + randomDirection.x * _wanderDistance,
             transform.position.y,
             transform.position.z + randomDirection.y * _wanderDistance
             );

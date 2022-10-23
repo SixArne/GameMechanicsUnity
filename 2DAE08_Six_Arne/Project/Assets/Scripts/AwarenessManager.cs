@@ -15,15 +15,20 @@ public class AwarenessManager : MonoBehaviour
     [SerializeField] private float _publicAwareness = 0f;
     [SerializeField] private AwarenessLevel _level = AwarenessLevel.Normal;
     [SerializeField] private GameObject _player = null;
+    [SerializeField] private GameObject _grim = null;
 
     const string _playerTag = "Friendly";
     const string _agentTag = "Agent";
+    const string _grimTag = "Enemy";
 
     private List<AgentCharacter> _agents = new List<AgentCharacter>();
+    private GrimReaper _reaper = null;
 
     void Awake()
     {
         _player = GameObject.FindGameObjectWithTag(_playerTag);
+        _grim = GameObject.FindGameObjectWithTag(_grimTag);
+
         GameObject[] agents = GameObject.FindGameObjectsWithTag(_agentTag);
 
         foreach (GameObject agent in agents)
@@ -31,6 +36,10 @@ public class AwarenessManager : MonoBehaviour
 
         if (!_player)
             throw new UnityException("Could not find player");
+
+        if (_grim)
+            _reaper = _grim.GetComponent<GrimReaper>();
+
     }
 
     public AwarenessLevel Level
@@ -74,6 +83,12 @@ public class AwarenessManager : MonoBehaviour
 
         foreach (AgentCharacter agent in _agents)
         {
+            if (agent.State == AgentCharacter.AgentState.Dead && !agent.IsReaped)
+            {
+                _reaper.State = GrimReaper.GrimState.Collecting;
+                _reaper.DeadAgent = agent.gameObject;
+            }
+
             if (agent.HasSeenCrime)
             {
                 IncreaseAwareness();

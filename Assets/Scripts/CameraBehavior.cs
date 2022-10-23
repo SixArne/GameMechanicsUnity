@@ -15,6 +15,7 @@ public class CameraBehavior : MonoBehaviour
 
     void Start()
     {
+        transform.position = _player.transform.position + _offset;
         transform.LookAt(_player.transform.position);    
     }
 
