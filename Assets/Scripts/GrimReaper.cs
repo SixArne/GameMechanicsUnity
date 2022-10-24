@@ -28,6 +28,7 @@ public class GrimReaper : BasicNavMeshAgent
     private PlayerCharacter _playerCharacter;
 
     private bool _canKillPlayer = true;
+    private bool _isGameOver = false;
     private GameObject _deadAgent = null;
 
     public GrimState State
@@ -47,11 +48,21 @@ public class GrimReaper : BasicNavMeshAgent
         base.Awake();
 
         _player = GameObject.FindGameObjectWithTag(_playerTag);
-        _playerCharacter = _player.GetComponent<PlayerCharacter>();
+
+        
+
         _sceneManager = GameObject.FindObjectOfType<SceneManager>();
 
         if (!_player)
             throw new UnityException("No player found");
+    }
+
+    protected void Start()
+    {
+        if (_player == null)
+            Debug.LogError("Player not found");
+        else
+            _playerCharacter = _player.GetComponent<PlayerCharacter>();
     }
 
     private void Update()
@@ -73,10 +84,12 @@ public class GrimReaper : BasicNavMeshAgent
         if (transformPosition.sqrMagnitude <= _killRadius * _killRadius && _canKillPlayer)
         {
             _canKillPlayer = false;
-            _playerCharacter.DestroyPlayer();
 
+            if (_playerCharacter)
+                _playerCharacter.DestroyPlayer();
 
-            Invoke("EndGame", 0.5f);
+            if (!_isGameOver)
+                Invoke("EndGame", 0.5f);
 
             _state = GrimState.Collecting;
         }

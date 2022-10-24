@@ -142,7 +142,7 @@ public class PlayerCharacter : BasicCharacter
         Instantiate(_deathParticle, transform.position, transform.rotation);
 
         // set active to let animation play out
-        gameObject.SetActive(false);
-        Destroy(gameObject, 2f);
+        // gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 }
