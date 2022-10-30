@@ -17,13 +17,13 @@ public class GrimReaper : BasicNavMeshAgent
     [SerializeField] private float _collectDuration = 5f;
     [SerializeField] private float _collectRadius = 3f;
     [SerializeField] private float _killRadius = 5f;
+    [SerializeField] private float _heinSpeedIncrease = 0.5f;
 
     [Header("SceneManager")]
     [SerializeField] private SceneManager _sceneManager = null;
 
     const string _playerTag = "Friendly";
 
-    private GameObject _player;
     private float _currentTimer = 0f;
     private PlayerCharacter _playerCharacter;
 
@@ -47,27 +47,22 @@ public class GrimReaper : BasicNavMeshAgent
     {
         base.Awake();
 
-        _player = GameObject.FindGameObjectWithTag(_playerTag);
-
-        
-
+        _playerCharacter = GameObject.FindObjectOfType<PlayerCharacter>();
         _sceneManager = GameObject.FindObjectOfType<SceneManager>();
 
-        if (!_player)
-            throw new UnityException("No player found");
+        //Debug.LogError($"scne is: {_sceneManager}");
+
+
     }
 
     protected void Start()
     {
-        if (_player == null)
-            Debug.LogError("Player not found");
-        else
-            _playerCharacter = _player.GetComponent<PlayerCharacter>();
+      
     }
 
     private void Update()
     {
-        if (!_player)
+        if (!_playerCharacter)
             return;
 
         switch (_state)
@@ -80,7 +75,7 @@ public class GrimReaper : BasicNavMeshAgent
                 break;
         }
 
-        Vector3 transformPosition = _player.transform.position - transform.position;
+        Vector3 transformPosition = _playerCharacter.transform.position - transform.position;
         if (transformPosition.sqrMagnitude <= _killRadius * _killRadius && _canKillPlayer)
         {
             _canKillPlayer = false;
@@ -97,7 +92,7 @@ public class GrimReaper : BasicNavMeshAgent
     
     private void EndGame()
     {
-        _sceneManager.MenuScene();
+        _sceneManager.DeathScene();
     }
 
     private void CollectSoul()
@@ -118,7 +113,7 @@ public class GrimReaper : BasicNavMeshAgent
                 _currentTimer = 0f;
 
                 // Make hein bit faster
-                _agent.speed += 10f;
+                _agent.speed += _heinSpeedIncrease;
 
                 Destroy(_deadAgent);
             }
@@ -133,7 +128,7 @@ public class GrimReaper : BasicNavMeshAgent
 
     private void ChaseProtagist()
     {
-        Target = _player.transform.position;
+        Target = _playerCharacter.transform.position;
         base.Seek();
     }
 

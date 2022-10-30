@@ -106,6 +106,7 @@ public class AgentCharacter : BasicNavMeshAgent
         {
             // stop agent and mark as dead.
             _agent.isStopped = true;
+            // unlock rotation.
 
             // set to prevent entering this again
             _isDead = true;
