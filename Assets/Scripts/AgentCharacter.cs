@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -19,7 +20,7 @@ public class AgentCharacter : BasicNavMeshAgent
     private Vector3 _wanderDestination = Vector3.zero;
     private float _wanderCooldown = 0f;
     private float _blindEyeTimer = 0f;
-    private GameObject _player;
+    private PlayerCharacter _player;
 
     private bool _isFollowing = false;
     private bool _isMarkedForKilling = false;
@@ -27,6 +28,7 @@ public class AgentCharacter : BasicNavMeshAgent
     private bool _hasSeenCrime = false;
     private bool _isReaped = false;
     private bool _isTurningBlindEye = false;
+    private bool _canInteract = false;
 
     private AwarenessBehavior _awarenessBehavior = null;
 
@@ -42,7 +44,7 @@ public class AgentCharacter : BasicNavMeshAgent
     {
         base.Awake();
 
-        _player = GameObject.FindGameObjectWithTag("Friendly");
+        _player = GameObject.FindObjectOfType<PlayerCharacter>();
         _awarenessBehavior = GetComponent<AwarenessBehavior>();
     }
 
@@ -53,6 +55,16 @@ public class AgentCharacter : BasicNavMeshAgent
         {
             _isFollowing = value;
             _awarenessBehavior.IsFollowing = value;
+        }
+    }
+
+    public bool CanInteract
+    {
+        get => _canInteract;
+        set
+        {
+            _canInteract = value;
+            _awarenessBehavior.CanInteract = value;
         }
     }
 
@@ -102,6 +114,13 @@ public class AgentCharacter : BasicNavMeshAgent
     {
         HandleCoolDowns();
 
+        int myId = GetInstanceID();
+        if (_player.ClosestId != myId)
+        {
+            // only the getter triggers the awareness behavior
+            CanInteract = false;
+        }
+
         if (_isMarkedForKilling && _state == AgentState.Dead)
         {
             // stop agent and mark as dead.
@@ -116,6 +135,9 @@ public class AgentCharacter : BasicNavMeshAgent
             _isMarkedForKilling = false;
 
             _Visuals.GetComponent<MeshRenderer>().material = _DeathMaterial;
+            gameObject.GetComponent<NavMeshAgent>().enabled = false;
+
+            transform.Rotate(new Vector3(0f, 0f, 90f ));
 
             Instantiate(_DeathParticle, transform);
         }

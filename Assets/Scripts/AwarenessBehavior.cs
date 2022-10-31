@@ -10,6 +10,7 @@ public class AwarenessBehavior : MonoBehaviour
 {
     [SerializeField] private Image _killImage;
     [SerializeField] private Image _followImage;
+    [SerializeField] private GameObject _UIPannel;
     [SerializeField] private float _agentInteractRadius = 5f;
     [SerializeField] private float _crimeRayLength = 5f;
     [SerializeField] private LayerMask _playerMask;
@@ -42,6 +43,12 @@ public class AwarenessBehavior : MonoBehaviour
         set => _isDead = value;
     }
 
+    public bool CanInteract
+    {
+        get => _canInteract;
+        set => _canInteract = value;
+    }
+
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag(_playerTag);
@@ -52,12 +59,18 @@ public class AwarenessBehavior : MonoBehaviour
         if (!_player)
             return;
 
-        _canInteract = false;
-
-        if ((transform.position - _player.transform.position).sqrMagnitude <=
-            _agentInteractRadius * _agentInteractRadius)
+        if (!_canInteract)
         {
-            _canInteract = true;
+            _UIPannel.SetActive(false);
+        }
+        else
+        {
+            _UIPannel.SetActive(true);
+        }
+
+        if (_isDead)
+        {
+            _UIPannel.SetActive(false);
         }
 
         if (!_canKill && _canInteract || _isDead)
@@ -87,6 +100,8 @@ public class AwarenessBehavior : MonoBehaviour
         }
 
         DetectCrime();
+
+        //_canInteract = false;
     }
 
     void FixedUpdate()
