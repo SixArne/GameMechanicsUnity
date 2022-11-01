@@ -142,6 +142,10 @@ public class PlayerCharacter : BasicCharacter
                 agentCharacter.IsFollowing = !agentCharacter.IsFollowing;
             }
         }
+        else
+        {
+            _closestId = 0;
+        }
     }
 
     public void DestroyPlayer()

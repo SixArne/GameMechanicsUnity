@@ -5,15 +5,16 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(VisionCone))]
 public class AgentCharacter : BasicNavMeshAgent
 {
     [SerializeField] private float _wanderDistance = 5f;
     [SerializeField] private float _reachedDestination = 5f;
     [SerializeField] private ParticleSystem _DeathParticle;
-    [SerializeField] private GameObject _Visuals;
+    [SerializeField] private GameObject _visuals;
     [SerializeField] private Material _DeathMaterial;
     [SerializeField] readonly private float _wanderMaxCooldown = 5f;
-    [SerializeField] private float _blindEyeCooldown = 15f;
+    [SerializeField] private float _blindEyeCooldown = 60f;
     [SerializeField] AgentState _state = AgentState.Wander;
 
     private bool _hasReachedDestination = false;
@@ -31,6 +32,7 @@ public class AgentCharacter : BasicNavMeshAgent
     private bool _canInteract = false;
 
     private AwarenessBehavior _awarenessBehavior = null;
+    private VisionCone _visionCone = null;
 
     public enum AgentState
     {
@@ -46,6 +48,7 @@ public class AgentCharacter : BasicNavMeshAgent
 
         _player = GameObject.FindObjectOfType<PlayerCharacter>();
         _awarenessBehavior = GetComponent<AwarenessBehavior>();
+        _visionCone = GetComponent<VisionCone>();
     }
 
     public bool IsFollowing
@@ -114,32 +117,11 @@ public class AgentCharacter : BasicNavMeshAgent
     {
         HandleCoolDowns();
 
-        int myId = GetInstanceID();
-        if (_player.ClosestId != myId)
-        {
-            // only the getter triggers the awareness behavior
-            CanInteract = false;
-        }
+        OnClosest();
 
         if (_isMarkedForKilling && _state == AgentState.Dead)
         {
-            // stop agent and mark as dead.
-            _agent.isStopped = true;
-            // unlock rotation.
-
-            // set to prevent entering this again
-            _isDead = true;
-            _state = AgentState.Dead;
-
-            // unmark to prevent looping animation
-            _isMarkedForKilling = false;
-
-            _Visuals.GetComponent<MeshRenderer>().material = _DeathMaterial;
-            gameObject.GetComponent<NavMeshAgent>().enabled = false;
-
-            transform.Rotate(new Vector3(0f, 0f, 90f ));
-
-            Instantiate(_DeathParticle, transform);
+            OnDead();
         }
         else if (_state == AgentState.Follow && _player)
         {
@@ -156,6 +138,47 @@ public class AgentCharacter : BasicNavMeshAgent
         WatchForCrimes();
     }
 
+    private void OnClosest()
+    {
+        int myId = GetInstanceID();
+        if (_player.ClosestId != myId)
+        {
+            // only the getter triggers the awareness behavior
+            CanInteract = false;
+        }
+    }
+
+    private void OnDead()
+    {
+        // stop agent and mark as dead.
+        _agent.isStopped = true;
+        // unlock rotation.
+
+        // set to prevent entering this again
+        _isDead = true;
+        _state = AgentState.Dead;
+
+        foreach (Transform t in transform)
+        {
+            t.gameObject.tag = "dead";
+        }
+
+        gameObject.tag = "dead";
+
+        // unmark to prevent looping animation
+        _isMarkedForKilling = false;
+
+        _visuals.GetComponent<MeshRenderer>().material = _DeathMaterial;
+        
+        // Dead men tell no tales
+        _visionCone.enabled = false;
+        gameObject.GetComponent<NavMeshAgent>().enabled = false;
+
+        transform.Rotate(new Vector3(0f, 0f, 90f));
+
+        Instantiate(_DeathParticle, transform);
+    }
+
     private void HandleCoolDowns()
     {
         if (_isTurningBlindEye)
@@ -163,7 +186,10 @@ public class AgentCharacter : BasicNavMeshAgent
             _blindEyeTimer += Time.deltaTime;
 
             if (_blindEyeTimer >= _blindEyeCooldown)
+            {
                 _isTurningBlindEye = false;
+                _blindEyeTimer = 0f;
+            }
         }
     }
 
@@ -211,11 +237,11 @@ public class AgentCharacter : BasicNavMeshAgent
 
     private void WatchForCrimes()
     {
-        // vision cone and detect player stabbing agent
-        if (!_isTurningBlindEye) 
+        // if body is in sight
+        if (_visionCone.IsInSight && !_isTurningBlindEye)
         {
-            // if agent has seen stuff
-            TurnBlindEye();
+            _hasSeenCrime = true;
+            _isTurningBlindEye = true;
         }
     }
 

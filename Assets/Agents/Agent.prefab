@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2531549993619861140}
   - component: {fileID: 5295058088817230170}
   - component: {fileID: 776183698745045527}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,8 +28,8 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1246888047624748868}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.542}
+  m_LocalScale: {x: 0.04143439, y: 0.04143439, z: 0.04143439}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3916148521492844569}
@@ -38,8 +38,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 3.000001}
-  m_SizeDelta: {x: 2, y: 2}
+  m_AnchoredPosition: {x: 0.01, y: 3.554}
+  m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1703863863162157768
 Canvas:
@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 4337624737983965020}
   - component: {fileID: 7561936005390797864}
   - component: {fileID: 5271297888345122367}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Text (TMP) (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,7 +260,7 @@ GameObject:
   - component: {fileID: 2656104322485176492}
   - component: {fileID: 8643843736175146723}
   - component: {fileID: 8874804457455307459}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Text (TMP) (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -395,7 +395,7 @@ GameObject:
   - component: {fileID: 5995926174879029152}
   - component: {fileID: 6980754411489497705}
   - component: {fileID: 3216337742202647681}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Kill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -474,6 +474,7 @@ GameObject:
   - component: {fileID: 8690132736868391223}
   - component: {fileID: 4978672552995074779}
   - component: {fileID: 1566566283}
+  - component: {fileID: 7254820405791828822}
   m_Layer: 7
   m_Name: Agent
   m_TagString: Agent
@@ -540,9 +541,9 @@ MonoBehaviour:
   _wanderDistance: 20
   _reachedDestination: 3.07
   _DeathParticle: {fileID: 6285873051999190894, guid: cde65c0b351d23b4eb08a505f5efab7c, type: 3}
-  _Visuals: {fileID: 6681978476229745797}
+  _visuals: {fileID: 6681978476229745797}
   _DeathMaterial: {fileID: 2100000, guid: 7c8d6170957e97b48887f79c68ae6d33, type: 2}
-  _blindEyeCooldown: 15
+  _blindEyeCooldown: 60
   _state: 1
 --- !u!114 &4978672552995074779
 MonoBehaviour:
@@ -579,6 +580,27 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7254820405791828822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6426386113527437925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d59980e5a6e78a408001799fd9a4711, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _viewAngle: 55
+  _viewRadius: 18.2
+  _targetMask:
+    serializedVersion: 2
+    m_Bits: 128
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _visibleTargets: []
 --- !u!1 &6681978476229745797
 GameObject:
   m_ObjectHideFlags: 0
@@ -673,7 +695,7 @@ GameObject:
   - component: {fileID: 3916148521492844569}
   - component: {fileID: 6137929601240477375}
   - component: {fileID: 3729148675149207247}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -689,7 +711,7 @@ RectTransform:
   m_GameObject: {fileID: 8442277448538984689}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.018886, y: 0.018886, z: 0.018886}
+  m_LocalScale: {x: 0.44038376, y: 0.44038376, z: 0.44038376}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5995926174879029152}
@@ -751,7 +773,7 @@ GameObject:
   - component: {fileID: 6174233855878159967}
   - component: {fileID: 1307985337130533041}
   - component: {fileID: 4670986189722070866}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Follow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

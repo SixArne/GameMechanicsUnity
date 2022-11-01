@@ -89,12 +89,13 @@ public class AwarenessManager : MonoBehaviour
                 _reaper.DeadAgent = agent.gameObject;
             }
 
-            if (agent.HasSeenCrime)
+            if (agent.HasSeenCrime && agent.State != AgentCharacter.AgentState.Dead)
             {
                 IncreaseAwareness();
 
                 // Set agent blind to crimeS
                 agent.HasSeenCrime = false;
+                Debug.Log("OMG SHE IS DEAD");
             }
         }
     }

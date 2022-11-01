@@ -6,18 +6,12 @@ public class UI : MonoBehaviour
 {
     [SerializeField] TMPro.TMP_Text _text;
 
-    private int a = 0;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private float a = 0;
 
     // Update is called once per frame
     void Update()
     {
-        a++;
-        _text.text = a.ToString();
+        a += Time.deltaTime;
+        _text.text = ((int)a).ToString();
     }
 }
