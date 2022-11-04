@@ -520,7 +520,7 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 1
+  m_ObstacleAvoidanceType: 0
 --- !u!114 &8690132736868391223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -544,7 +544,7 @@ MonoBehaviour:
   _visuals: {fileID: 6681978476229745797}
   _DeathMaterial: {fileID: 2100000, guid: 7c8d6170957e97b48887f79c68ae6d33, type: 2}
   _blindEyeCooldown: 60
-  _state: 1
+  _state: 0
 --- !u!114 &4978672552995074779
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -592,8 +592,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d59980e5a6e78a408001799fd9a4711, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _viewAngle: 55
-  _viewRadius: 18.2
+  _viewAngle: 109
+  _viewRadius: 17.6
   _targetMask:
     serializedVersion: 2
     m_Bits: 128

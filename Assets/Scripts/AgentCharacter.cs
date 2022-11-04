@@ -242,6 +242,8 @@ public class AgentCharacter : BasicNavMeshAgent
         {
             _hasSeenCrime = true;
             _isTurningBlindEye = true;
+
+            
         }
     }
 

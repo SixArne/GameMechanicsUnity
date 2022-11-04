@@ -7,15 +7,16 @@ public class AwarenessManager : MonoBehaviour
     public enum AwarenessLevel
     {
         Normal = 0,
-        Alerted = 10,
-        HighAlert = 20,
-        Elimination = 30
+        Alerted,
+        HighAlert,
+        Elimination
     }
 
     [SerializeField] private float _publicAwareness = 0f;
     [SerializeField] private AwarenessLevel _level = AwarenessLevel.Normal;
     [SerializeField] private GameObject _player = null;
     [SerializeField] private GameObject _grim = null;
+    [SerializeField] private AudioSource _securityIncreaseSound = null;
 
     const string _playerTag = "Friendly";
     const string _agentTag = "Agent";
@@ -47,9 +48,14 @@ public class AwarenessManager : MonoBehaviour
         get => _level;
     }
 
+    public float PublicAwareness
+    {
+        get => _publicAwareness;
+    }
+
     private void IncreaseAwareness()
     {
-        _publicAwareness += 1;
+        _publicAwareness += 5;
     }
 
     private void DecreaseAwareness(int amount)
@@ -59,6 +65,9 @@ public class AwarenessManager : MonoBehaviour
 
     private void OnSecurityIncrease()
     {
+        if (_securityIncreaseSound != null)
+            _securityIncreaseSound.Play();
+
         foreach (AgentCharacter agent in _agents)
         {
             // notify agents of security increase.
@@ -70,10 +79,16 @@ public class AwarenessManager : MonoBehaviour
     private void MonitorPublicAwareness()
     {
         // Every 10 stages the awareness will increase.
-        if (_publicAwareness / 10 >= 1)
+        if ((int)_publicAwareness / 10 >= 1)
         {
-            _level = (AwarenessLevel)Mathf.Clamp((int)_level++, 0, 3);
-            OnSecurityIncrease();
+            int oldLevel = (int)_level;
+            int newLevel = Mathf.Clamp(++oldLevel, 0, 3);
+            _level = (AwarenessLevel)newLevel;
+            
+            if ((AwarenessLevel)oldLevel != _level)
+                OnSecurityIncrease();
+
+            _publicAwareness = 0f;
         }
     }
 
