@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
 public class AwarenessManager : MonoBehaviour
 {
@@ -24,11 +25,13 @@ public class AwarenessManager : MonoBehaviour
 
     private List<AgentCharacter> _agents = new List<AgentCharacter>();
     private GrimReaper _reaper = null;
+    private Vignette _ppp;
 
     void Awake()
     {
         _player = GameObject.FindGameObjectWithTag(_playerTag);
         _grim = GameObject.FindGameObjectWithTag(_grimTag);
+        _ppp = Camera.main.gameObject.GetComponent<PostProcessVolume>().profile.GetSetting<Vignette>();
 
         GameObject[] agents = GameObject.FindGameObjectsWithTag(_agentTag);
 
@@ -41,6 +44,8 @@ public class AwarenessManager : MonoBehaviour
         if (_grim)
             _reaper = _grim.GetComponent<GrimReaper>();
 
+        if (!_ppp)
+            throw new UnityException("Could not find post-process volume");
     }
 
     public AwarenessLevel Level
@@ -68,6 +73,8 @@ public class AwarenessManager : MonoBehaviour
         if (_securityIncreaseSound != null)
             _securityIncreaseSound.Play();
 
+        StartCoroutine("IncreaseVignette");
+
         foreach (AgentCharacter agent in _agents)
         {
             // notify agents of security increase.
@@ -76,13 +83,26 @@ public class AwarenessManager : MonoBehaviour
         // Spawn special units after while
     }
 
+    IEnumerator IncreaseVignette()
+    {
+        float vignetteLevel = 0f;
+
+        while (vignetteLevel <= 0.17f)
+        {
+            _ppp.intensity.value += Time.deltaTime;
+            vignetteLevel += Time.deltaTime;
+
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+
     private void MonitorPublicAwareness()
     {
         // Every 10 stages the awareness will increase.
         if ((int)_publicAwareness / 10 >= 1)
         {
             int oldLevel = (int)_level;
-            int newLevel = Mathf.Clamp(++oldLevel, 0, 3);
+            int newLevel = Mathf.Clamp(oldLevel + 1, 0, 3);
             _level = (AwarenessLevel)newLevel;
             
             if ((AwarenessLevel)oldLevel != _level)

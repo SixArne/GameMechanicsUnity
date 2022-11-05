@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
 
 public class UI : MonoBehaviour
@@ -11,7 +12,6 @@ public class UI : MonoBehaviour
 
     private float a = 0;
 
-    // Update is called once per frame
     void Update()
     {
         UpdateScore();
