@@ -128,7 +128,7 @@ public class PlayerCharacter : BasicCharacter
                 _meshRenderer.material = _DeathMaterial;
             }
 
-            if (hasPressedFollow)
+            if (hasPressedFollow && !agentCharacter.CanRunAway)
             {
                 if (agentCharacter.State == AgentCharacter.AgentState.Follow)
                 {

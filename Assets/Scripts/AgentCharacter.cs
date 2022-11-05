@@ -16,6 +16,8 @@ public class AgentCharacter : BasicNavMeshAgent
     [SerializeField] readonly private float _wanderMaxCooldown = 5f;
     [SerializeField] private float _blindEyeCooldown = 60f;
     [SerializeField] AgentState _state = AgentState.Wander;
+    [SerializeField] float _playerDetectRadius = 10f;
+    [SerializeField] LayerMask _playerMask;
 
     private bool _hasReachedDestination = false;
     private Vector3 _wanderDestination = Vector3.zero;
@@ -30,6 +32,7 @@ public class AgentCharacter : BasicNavMeshAgent
     private bool _isReaped = false;
     private bool _isTurningBlindEye = false;
     private bool _canInteract = false;
+    private bool _canRunAway = false;
 
     private AwarenessBehavior _awarenessBehavior = null;
     private VisionCone _visionCone = null;
@@ -40,6 +43,7 @@ public class AgentCharacter : BasicNavMeshAgent
         Idle,
         Follow,
         Dead,
+        Flee
     }
 
     protected override void Awake()
@@ -108,6 +112,12 @@ public class AgentCharacter : BasicNavMeshAgent
         set => _state = value;
     }
 
+    public bool CanRunAway
+    {
+        get => _canRunAway;
+        set => _canRunAway = value;
+    }
+
     void Start()
     {
         CalculateWanderDestination();
@@ -116,6 +126,8 @@ public class AgentCharacter : BasicNavMeshAgent
     public void Update()
     {
         HandleCoolDowns();
+
+        DetermineState();
 
         OnClosest();
 
@@ -134,8 +146,26 @@ public class AgentCharacter : BasicNavMeshAgent
         {
             Wander();
         }
+        else if (_state == AgentState.Flee)
+        {
+            Flee();
+        }
 
         WatchForCrimes();
+    }
+
+    private void DetermineState()
+    {
+        if (_state != AgentState.Flee && _state != AgentState.Dead)
+        {
+            Collider[] colliders = Physics.OverlapSphere(transform.position, _playerDetectRadius, _playerMask);
+
+            if (colliders.Length > 0 && CanRunAway)
+            {
+                Debug.Log("RUN");
+                _state = AgentState.Flee;
+            }
+        } 
     }
 
     private void OnClosest()
@@ -213,6 +243,44 @@ public class AgentCharacter : BasicNavMeshAgent
         base.Seek();
     }
 
+    protected override void Flee()
+    {
+        if (_hasReachedDestination)
+        {
+            if ((_player.transform.position - transform.position).sqrMagnitude <= _fleeDistance * _fleeDistance)
+            {
+                // calculate new dest
+                _hasReachedDestination = false;
+                CalculateFleeDestination();
+            }
+            else
+            {
+                _state = AgentState.Wander;
+                CalculateWanderDestination();
+            }
+        }
+
+        if ((_wanderDestination - transform.position).sqrMagnitude <= _reachedDestination * _reachedDestination)
+        {
+            _hasReachedDestination = true;
+            return;
+        }
+
+        _target = _wanderDestination;
+        base.Seek();
+    }
+
+    private void CalculateFleeDestination()
+    {
+        Vector3 offset = _player.transform.position - transform.position;
+
+        NavMeshHit navMeshHit;
+        if (NavMesh.SamplePosition(offset, out navMeshHit, 100f, NavMesh.AllAreas))
+        {
+            _wanderDestination = navMeshHit.position;
+        }
+    }
+
     private void CalculateWanderDestination()
     {
         Vector2 randomDirection = Random.insideUnitCircle;
@@ -252,6 +320,10 @@ public class AgentCharacter : BasicNavMeshAgent
         Gizmos.color = new Color(1, 0, 1, 0.4f);
         Gizmos.DrawSphere(transform.position, _reachedDestination);
 
+        Gizmos.color = new Color(0, 0, 1, 0.4f);
+        Gizmos.DrawSphere(transform.position, _playerDetectRadius);
+
+        Gizmos.color = new Color(1, 1, 1, 0.4f);
         Gizmos.DrawSphere(_wanderDestination, 2f);
     }
 }

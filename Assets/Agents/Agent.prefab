@@ -545,6 +545,10 @@ MonoBehaviour:
   _DeathMaterial: {fileID: 2100000, guid: 7c8d6170957e97b48887f79c68ae6d33, type: 2}
   _blindEyeCooldown: 60
   _state: 0
+  _playerDetectRadius: 10
+  _playerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &4978672552995074779
 MonoBehaviour:
   m_ObjectHideFlags: 0

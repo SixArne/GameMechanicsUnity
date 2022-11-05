@@ -75,10 +75,25 @@ public class AwarenessManager : MonoBehaviour
 
         StartCoroutine("IncreaseVignette");
 
-        foreach (AgentCharacter agent in _agents)
+        if (_level == AwarenessLevel.Alerted)
         {
-            // notify agents of security increase.
+            foreach (AgentCharacter agent in _agents)
+            {
+                int val = Random.Range(0, 4);
+
+                if (val % 2 == 0)
+                    agent.CanRunAway = true;
+            }
         }
+        else if (_level == AwarenessLevel.HighAlert)
+        {
+            foreach (AgentCharacter agent in _agents)
+            {
+                agent.CanRunAway = true;
+            }
+        }
+        //TODO: add highest alert
+        
 
         // Spawn special units after while
     }
