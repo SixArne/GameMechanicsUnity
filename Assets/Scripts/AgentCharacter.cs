@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -18,6 +16,8 @@ public class AgentCharacter : BasicNavMeshAgent
     [SerializeField] AgentState _state = AgentState.Wander;
     [SerializeField] float _playerDetectRadius = 10f;
     [SerializeField] LayerMask _playerMask;
+    [SerializeField] float _normalSpeed = 0f;
+    [SerializeField] float _fleeSpeed = 5f;
 
     private bool _hasReachedDestination = false;
     private Vector3 _wanderDestination = Vector3.zero;
@@ -53,6 +53,8 @@ public class AgentCharacter : BasicNavMeshAgent
         _player = GameObject.FindObjectOfType<PlayerCharacter>();
         _awarenessBehavior = GetComponent<AwarenessBehavior>();
         _visionCone = GetComponent<VisionCone>();
+
+        _agent.speed = _normalSpeed;
     }
 
     public bool IsFollowing
@@ -115,7 +117,11 @@ public class AgentCharacter : BasicNavMeshAgent
     public bool CanRunAway
     {
         get => _canRunAway;
-        set => _canRunAway = value;
+        set
+        {
+            _canRunAway = value;
+            _awarenessBehavior.CanFollow = false;
+        }
     }
 
     void Start()
@@ -164,6 +170,7 @@ public class AgentCharacter : BasicNavMeshAgent
             {
                 Debug.Log("RUN");
                 _state = AgentState.Flee;
+                _agent.speed = _fleeSpeed;
             }
         } 
     }
@@ -256,6 +263,7 @@ public class AgentCharacter : BasicNavMeshAgent
             else
             {
                 _state = AgentState.Wander;
+                _agent.speed = _normalSpeed;
                 CalculateWanderDestination();
             }
         }
@@ -272,10 +280,10 @@ public class AgentCharacter : BasicNavMeshAgent
 
     private void CalculateFleeDestination()
     {
-        Vector3 offset = _player.transform.position - transform.position;
+        Vector3 offset = (_player.transform.position - transform.position).normalized;
 
         NavMeshHit navMeshHit;
-        if (NavMesh.SamplePosition(offset, out navMeshHit, 100f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(offset * 50f, out navMeshHit, 100f, NavMesh.AllAreas))
         {
             _wanderDestination = navMeshHit.position;
         }
@@ -310,8 +318,6 @@ public class AgentCharacter : BasicNavMeshAgent
         {
             _hasSeenCrime = true;
             _isTurningBlindEye = true;
-
-            
         }
     }
 

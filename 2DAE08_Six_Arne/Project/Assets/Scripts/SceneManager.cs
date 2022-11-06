@@ -8,6 +8,7 @@ public class SceneManager : MonoBehaviour
     const string _menuScene = "MainMenu";
     const string _introScene = "IntroScene";
     const string _storyScene = "StoryScene";
+    const string _deathScene = "DeathMenu";
 
     public void Play()
     {
@@ -32,5 +33,10 @@ public class SceneManager : MonoBehaviour
     public void LoadScene(string sceneName)
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+    }
+
+    public void DeathScene()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(_deathScene);
     }
 }

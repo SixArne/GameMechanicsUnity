@@ -9,6 +9,7 @@ TagManager:
   - Ground
   - StaticLevel
   - Agent
+  - dead
   layers:
   - Default
   - TransparentFX

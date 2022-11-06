@@ -14,6 +14,7 @@ public class PlayerCharacter : BasicCharacter
     [SerializeField] private Material _DeathMaterial;
     [SerializeField] private GameObject _Visuals;
     [SerializeField] private ParticleSystem _deathParticle;
+    [SerializeField] GameObject _daggers;
 
     private Material _playerMat;
     private MeshRenderer _meshRenderer;
@@ -22,6 +23,12 @@ public class PlayerCharacter : BasicCharacter
     private Plane _cursorMovementPlane;
 
     private const string _agentTag = "Agent";
+    private int _closestId = -1;
+
+    public int ClosestId
+    {
+        get => _closestId;
+    }
 
     protected override void Awake()
     {
@@ -55,7 +62,8 @@ public class PlayerCharacter : BasicCharacter
             _currentKillCooldown = 0f;
             _canKill = true;
 
-            _meshRenderer.material = _playerMat;
+            //_meshRenderer.material = _playerMat;
+            _daggers.SetActive(true);
         }
     }
 
@@ -91,58 +99,86 @@ public class PlayerCharacter : BasicCharacter
 
     void HandleInteraction()
     {
-        bool hasPressedFollow = Input.GetKeyUp(KeyCode.F);
-        bool hasPressedKill = Input.GetKeyUp(KeyCode.K);
+        bool hasPressedFollow = Input.GetKeyUp(KeyCode.Q);
+        bool hasPressedKill = Input.GetKeyUp(KeyCode.E);
 
-        if (hasPressedKill || hasPressedFollow)
+        // Get nearby colliders
+        Collider[] colliders = Physics.OverlapSphere(transform.position, _interactRadius, _interactionMask);
+        Collider collider = FindClosest(colliders);
+
+        if (collider != null)
         {
-            // Get nearby colliders
-            Collider[] colliders = Physics.OverlapSphere(transform.position, _interactRadius, _interactionMask);
+            // If we aren't dealing with an enemy exit early.
+            if (collider.gameObject.tag != _agentTag)
+                return;
 
-            foreach (Collider collider in colliders)
+            AgentCharacter agentCharacter = collider.gameObject.GetComponentInParent<AgentCharacter>();
+            agentCharacter.CanInteract = true;
+            _closestId = agentCharacter.GetInstanceID();
+
+
+            // Exit out early if agent is already dead.
+            if (agentCharacter.State == AgentCharacter.AgentState.Dead)
+                return;
+
+            if (hasPressedKill && _canKill)
             {
-                // If we aren't dealing with an enemy exit early.
-                if (collider.gameObject.tag != _agentTag)
-                    return;
+                agentCharacter.State = AgentCharacter.AgentState.Dead;
+                agentCharacter.IsMarkedForKilling = true;
+                _canKill = false;
 
-                AgentCharacter agentCharacter = collider.gameObject.GetComponentInParent<AgentCharacter>();
-
-                // Exit out early if agent is already dead.
-                if (agentCharacter.State == AgentCharacter.AgentState.Dead)
-                    return;
-
-                if (hasPressedKill && _canKill)
-                {
-                    agentCharacter.State = AgentCharacter.AgentState.Dead;
-                    agentCharacter.IsMarkedForKilling = true;
-                    _canKill = false;
-
-                    _meshRenderer.material = _DeathMaterial;
-                }
-
-                if (hasPressedFollow)
-                {
-                    if (agentCharacter.State == AgentCharacter.AgentState.Follow)
-                    {
-                        agentCharacter.State = AgentCharacter.AgentState.Wander;
-                    }
-                    else
-                    {
-                        agentCharacter.State = AgentCharacter.AgentState.Follow;
-                    }
-
-                    agentCharacter.IsFollowing = !agentCharacter.IsFollowing;
-                }
+                //_meshRenderer.material = _DeathMaterial;
+                _daggers.SetActive(false);
             }
+
+            if (hasPressedFollow && !agentCharacter.CanRunAway)
+            {
+                if (agentCharacter.State == AgentCharacter.AgentState.Follow)
+                {
+                    agentCharacter.State = AgentCharacter.AgentState.Wander;
+                }
+                else
+                {
+                    agentCharacter.State = AgentCharacter.AgentState.Follow;
+                }
+
+                agentCharacter.IsFollowing = !agentCharacter.IsFollowing;
+            }
+        }
+        else
+        {
+            _closestId = 0;
         }
     }
 
     public void DestroyPlayer()
     {
         Instantiate(_deathParticle, transform.position, transform.rotation);
+        Destroy(gameObject);
+    }
 
-        // set active to let animation play out
-        gameObject.SetActive(false);
-        Destroy(gameObject, 2f);
+    private Collider FindClosest(Collider[] colliders)
+    {
+        if (colliders.Length == 0)
+            return null;
+
+        Collider closest = colliders[0];
+        float closestDistanceSqr = _interactRadius * _interactRadius;
+
+        foreach (var collider in colliders)
+        {
+            float distanceSqr = (collider.transform.position - transform.position).sqrMagnitude;
+
+            if (distanceSqr < closestDistanceSqr && collider.CompareTag(_agentTag))
+            {
+                closest = collider;
+                closestDistanceSqr = distanceSqr;
+            }
+        }
+
+        if (!closest.CompareTag(_agentTag))
+            return null;
+        else
+            return closest;
     }
 }

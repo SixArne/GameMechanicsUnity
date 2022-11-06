@@ -14,6 +14,7 @@ public class PlayerCharacter : BasicCharacter
     [SerializeField] private Material _DeathMaterial;
     [SerializeField] private GameObject _Visuals;
     [SerializeField] private ParticleSystem _deathParticle;
+    [SerializeField] GameObject _daggers;
 
     private Material _playerMat;
     private MeshRenderer _meshRenderer;
@@ -61,7 +62,8 @@ public class PlayerCharacter : BasicCharacter
             _currentKillCooldown = 0f;
             _canKill = true;
 
-            _meshRenderer.material = _playerMat;
+            //_meshRenderer.material = _playerMat;
+            _daggers.SetActive(true);
         }
     }
 
@@ -97,8 +99,8 @@ public class PlayerCharacter : BasicCharacter
 
     void HandleInteraction()
     {
-        bool hasPressedFollow = Input.GetKeyUp(KeyCode.F);
-        bool hasPressedKill = Input.GetKeyUp(KeyCode.K);
+        bool hasPressedFollow = Input.GetKeyUp(KeyCode.Q);
+        bool hasPressedKill = Input.GetKeyUp(KeyCode.E);
 
         // Get nearby colliders
         Collider[] colliders = Physics.OverlapSphere(transform.position, _interactRadius, _interactionMask);
@@ -125,7 +127,8 @@ public class PlayerCharacter : BasicCharacter
                 agentCharacter.IsMarkedForKilling = true;
                 _canKill = false;
 
-                _meshRenderer.material = _DeathMaterial;
+                //_meshRenderer.material = _DeathMaterial;
+                _daggers.SetActive(false);
             }
 
             if (hasPressedFollow && !agentCharacter.CanRunAway)

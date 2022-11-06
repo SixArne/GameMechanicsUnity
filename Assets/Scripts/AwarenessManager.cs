@@ -18,6 +18,7 @@ public class AwarenessManager : MonoBehaviour
     [SerializeField] private GameObject _player = null;
     [SerializeField] private GameObject _grim = null;
     [SerializeField] private AudioSource _securityIncreaseSound = null;
+    [SerializeField] private int _amountOnSeen = 5;
 
     const string _playerTag = "Friendly";
     const string _agentTag = "Agent";
@@ -60,7 +61,7 @@ public class AwarenessManager : MonoBehaviour
 
     private void IncreaseAwareness()
     {
-        _publicAwareness += 5;
+        _publicAwareness += _amountOnSeen;
     }
 
     private void DecreaseAwareness(int amount)

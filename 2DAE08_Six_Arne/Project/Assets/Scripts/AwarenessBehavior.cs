@@ -10,6 +10,7 @@ public class AwarenessBehavior : MonoBehaviour
 {
     [SerializeField] private Image _killImage;
     [SerializeField] private Image _followImage;
+    [SerializeField] private GameObject _UIPannel;
     [SerializeField] private float _agentInteractRadius = 5f;
     [SerializeField] private float _crimeRayLength = 5f;
     [SerializeField] private LayerMask _playerMask;
@@ -23,6 +24,7 @@ public class AwarenessBehavior : MonoBehaviour
     private bool _canKill = true;
     private bool _isFollowing = false;
     private bool _isDead = false;
+    private bool _canFollow = true;
 
     public bool IsFollowing
     {
@@ -42,6 +44,18 @@ public class AwarenessBehavior : MonoBehaviour
         set => _isDead = value;
     }
 
+    public bool CanInteract
+    {
+        get => _canInteract;
+        set => _canInteract = value;
+    }
+
+    public bool CanFollow
+    {
+        get => _canFollow;
+        set => _canFollow = value;
+    }
+
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag(_playerTag);
@@ -52,12 +66,18 @@ public class AwarenessBehavior : MonoBehaviour
         if (!_player)
             return;
 
-        _canInteract = false;
-
-        if ((transform.position - _player.transform.position).sqrMagnitude <=
-            _agentInteractRadius * _agentInteractRadius)
+        if (!_canInteract)
         {
-            _canInteract = true;
+            _UIPannel.SetActive(false);
+        }
+        else
+        {
+            _UIPannel.SetActive(true);
+        }
+
+        if (_isDead)
+        {
+            _UIPannel.SetActive(false);
         }
 
         if (!_canKill && _canInteract || _isDead)
@@ -73,7 +93,7 @@ public class AwarenessBehavior : MonoBehaviour
             _killImage.color = new Color(1, 1, 1, 0);
         }
 
-        if (_isDead || _isFollowing)
+        if (_isDead || _isFollowing || !_canFollow)
         {
             _followImage.color = new Color(1, 1, 1, .5f);
         }
@@ -81,12 +101,11 @@ public class AwarenessBehavior : MonoBehaviour
         {
             _followImage.color = new Color(1, 1, 1, 1f);
         }
-        else
-        {
-            _followImage.color = new Color(1, 1, 1, 0);
-        }
+        
 
         DetectCrime();
+
+        //_canInteract = false;
     }
 
     void FixedUpdate()

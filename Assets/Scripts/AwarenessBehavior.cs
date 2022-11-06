@@ -24,6 +24,7 @@ public class AwarenessBehavior : MonoBehaviour
     private bool _canKill = true;
     private bool _isFollowing = false;
     private bool _isDead = false;
+    private bool _canFollow = true;
 
     public bool IsFollowing
     {
@@ -47,6 +48,12 @@ public class AwarenessBehavior : MonoBehaviour
     {
         get => _canInteract;
         set => _canInteract = value;
+    }
+
+    public bool CanFollow
+    {
+        get => _canFollow;
+        set => _canFollow = value;
     }
 
     void Start()
@@ -86,7 +93,7 @@ public class AwarenessBehavior : MonoBehaviour
             _killImage.color = new Color(1, 1, 1, 0);
         }
 
-        if (_isDead || _isFollowing)
+        if (_isDead || _isFollowing || !_canFollow)
         {
             _followImage.color = new Color(1, 1, 1, .5f);
         }
@@ -94,10 +101,7 @@ public class AwarenessBehavior : MonoBehaviour
         {
             _followImage.color = new Color(1, 1, 1, 1f);
         }
-        else
-        {
-            _followImage.color = new Color(1, 1, 1, 0);
-        }
+        
 
         DetectCrime();
 
