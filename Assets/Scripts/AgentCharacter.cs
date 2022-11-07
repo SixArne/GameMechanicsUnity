@@ -11,6 +11,8 @@ public class AgentCharacter : BasicNavMeshAgent
     [SerializeField] private ParticleSystem _DeathParticle;
     [SerializeField] private GameObject _visuals;
     [SerializeField] private Material _DeathMaterial;
+    [SerializeField] private Material _FollowMaterial;
+    [SerializeField] private Material _NormalMaterial;
     [SerializeField] readonly private float _wanderMaxCooldown = 5f;
     [SerializeField] private float _blindEyeCooldown = 60f;
     [SerializeField] AgentState _state = AgentState.Wander;
@@ -36,6 +38,7 @@ public class AgentCharacter : BasicNavMeshAgent
 
     private AwarenessBehavior _awarenessBehavior = null;
     private VisionCone _visionCone = null;
+    private MeshRenderer _meshRenderer = null;
 
     public enum AgentState
     {
@@ -53,6 +56,8 @@ public class AgentCharacter : BasicNavMeshAgent
         _player = GameObject.FindObjectOfType<PlayerCharacter>();
         _awarenessBehavior = GetComponent<AwarenessBehavior>();
         _visionCone = GetComponent<VisionCone>();
+        _meshRenderer = _visuals.GetComponent<MeshRenderer>();
+
 
         _agent.speed = _normalSpeed;
     }
@@ -144,16 +149,24 @@ public class AgentCharacter : BasicNavMeshAgent
         else if (_state == AgentState.Follow && _player)
         {
             Target = _player.transform.position;
+            _meshRenderer.material = _FollowMaterial;
+
             Seek();
+
+
 
             return;
         }
         else if (_state == AgentState.Wander)
         {
+            // overwrite old mats
+            _meshRenderer.material = _NormalMaterial;
             Wander();
         }
         else if (_state == AgentState.Flee)
         {
+            // overwrite old mats
+            _meshRenderer.material = _NormalMaterial;
             Flee();
         }
 
@@ -205,7 +218,7 @@ public class AgentCharacter : BasicNavMeshAgent
         // unmark to prevent looping animation
         _isMarkedForKilling = false;
 
-        _visuals.GetComponent<MeshRenderer>().material = _DeathMaterial;
+        _meshRenderer.material = _DeathMaterial;
         
         // Dead men tell no tales
         _visionCone.enabled = false;

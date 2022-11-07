@@ -543,6 +543,8 @@ MonoBehaviour:
   _DeathParticle: {fileID: 6285873051999190894, guid: cde65c0b351d23b4eb08a505f5efab7c, type: 3}
   _visuals: {fileID: 6681978476229745797}
   _DeathMaterial: {fileID: 2100000, guid: 7c8d6170957e97b48887f79c68ae6d33, type: 2}
+  _FollowMaterial: {fileID: 2100000, guid: 4515a74e9cdf2b746a0a659047f1ded3, type: 2}
+  _NormalMaterial: {fileID: 2100000, guid: a8a7607c4e857044cb99b1aeaa155bc4, type: 2}
   _blindEyeCooldown: 60
   _state: 0
   _playerDetectRadius: 10

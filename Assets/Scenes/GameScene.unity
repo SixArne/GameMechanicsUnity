@@ -13469,7 +13469,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1198694644254768985, guid: 2a5df2a423796d64999e4844a29a066b, type: 3}
       propertyPath: _spawnAmount
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1198694644254768985, guid: 2a5df2a423796d64999e4844a29a066b, type: 3}
       propertyPath: _spawnDistanceMax
@@ -22512,7 +22512,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1198694644254768985, guid: 2a5df2a423796d64999e4844a29a066b, type: 3}
       propertyPath: _spawnAmount
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1198694644254768985, guid: 2a5df2a423796d64999e4844a29a066b, type: 3}
       propertyPath: _spawnDistanceMax
