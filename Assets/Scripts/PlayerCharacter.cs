@@ -16,6 +16,9 @@ public class PlayerCharacter : BasicCharacter
     [SerializeField] private ParticleSystem _deathParticle;
     [SerializeField] GameObject _daggers;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource _stabSFX = null;
+
     private Material _playerMat;
     private MeshRenderer _meshRenderer;
     private bool _canKill = true;
@@ -113,6 +116,10 @@ public class PlayerCharacter : BasicCharacter
                 return;
 
             AgentCharacter agentCharacter = collider.gameObject.GetComponentInParent<AgentCharacter>();
+
+            if (!agentCharacter.IsInteractable)
+                return;
+
             agentCharacter.CanInteract = true;
             _closestId = agentCharacter.GetInstanceID();
 
@@ -126,6 +133,8 @@ public class PlayerCharacter : BasicCharacter
                 agentCharacter.State = AgentCharacter.AgentState.Dead;
                 agentCharacter.IsMarkedForKilling = true;
                 _canKill = false;
+
+                _stabSFX.Play();
 
                 //_meshRenderer.material = _DeathMaterial;
                 _daggers.SetActive(false);

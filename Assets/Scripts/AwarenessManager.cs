@@ -18,7 +18,13 @@ public class AwarenessManager : MonoBehaviour
     [SerializeField] private GameObject _player = null;
     [SerializeField] private GameObject _grim = null;
     [SerializeField] private AudioSource _securityIncreaseSound = null;
+    [SerializeField] private AudioSource _theme = null;
+    [SerializeField] private AudioSource _ambientNoise = null;
     [SerializeField] private int _amountOnSeen = 5;
+
+    [Header("Audio")]
+    [SerializeField] [Range(0, 1f)] private float _maxThemeVolume = 1f;
+    [SerializeField] [Range(0, 0.05f)] private float _themeStep = 0.005f;
 
     const string _playerTag = "Friendly";
     const string _agentTag = "Agent";
@@ -27,12 +33,14 @@ public class AwarenessManager : MonoBehaviour
     private List<AgentCharacter> _agents = new List<AgentCharacter>();
     private GrimReaper _reaper = null;
     private Vignette _ppp;
+    private bool _isPlayingTheme = false;
 
     void Awake()
     {
         _player = GameObject.FindGameObjectWithTag(_playerTag);
         _grim = GameObject.FindGameObjectWithTag(_grimTag);
         _ppp = Camera.main.gameObject.GetComponent<PostProcessVolume>().profile.GetSetting<Vignette>();
+        _ambientNoise.Play();
 
         GameObject[] agents = GameObject.FindGameObjectsWithTag(_agentTag);
 
@@ -78,6 +86,14 @@ public class AwarenessManager : MonoBehaviour
 
         if (_level == AwarenessLevel.Alerted)
         {
+            if (!_isPlayingTheme && _theme != null)
+            {
+                _theme.Play();
+                StartCoroutine("IncreaseAudio");
+                _isPlayingTheme = true;
+            }
+                
+
             foreach (AgentCharacter agent in _agents)
             {
                 int val = Random.Range(0, 4);
@@ -88,6 +104,13 @@ public class AwarenessManager : MonoBehaviour
         }
         else if (_level == AwarenessLevel.HighAlert)
         {
+            if (!_isPlayingTheme && _theme != null)
+            {
+                _theme.Play();
+                StartCoroutine("IncreaseAudio");
+                _isPlayingTheme = true;
+            }
+
             foreach (AgentCharacter agent in _agents)
             {
                 agent.CanRunAway = true;
@@ -97,6 +120,19 @@ public class AwarenessManager : MonoBehaviour
         
 
         // Spawn special units after while
+    }
+
+    IEnumerator IncreaseAudio()
+    {
+        float audioLevel = 0f;
+
+        while (audioLevel < _maxThemeVolume)
+        {
+           
+            audioLevel += _themeStep;
+            _theme.volume = audioLevel;
+            yield return new WaitForSeconds(0.05f);
+        }
     }
 
     IEnumerator IncreaseVignette()
@@ -134,7 +170,7 @@ public class AwarenessManager : MonoBehaviour
 
         foreach (AgentCharacter agent in _agents)
         {
-            if (agent.State == AgentCharacter.AgentState.Dead && !agent.IsReaped)
+            if (agent.State == AgentCharacter.AgentState.Dead && !agent.IsReaped && _reaper)
             {
                 _reaper.State = GrimReaper.GrimState.Collecting;
                 _reaper.DeadAgent = agent.gameObject;

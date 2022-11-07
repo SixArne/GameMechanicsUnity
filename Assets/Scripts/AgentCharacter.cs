@@ -21,6 +21,14 @@ public class AgentCharacter : BasicNavMeshAgent
     [SerializeField] float _normalSpeed = 0f;
     [SerializeField] float _fleeSpeed = 5f;
 
+    [Header("Gizmos")]
+    [SerializeField] bool _displayPlayerDetectRadius = false;
+    [SerializeField] bool _displayReachedDestination = false;
+    [SerializeField] bool _displayWanderDestination = false;
+
+    [Header("Settings")]
+    [SerializeField] [Tooltip("Disabling this will disable its update loop entirely")] bool _isInteractable = true;
+
     private bool _hasReachedDestination = false;
     private Vector3 _wanderDestination = Vector3.zero;
     private float _wanderCooldown = 0f;
@@ -70,6 +78,11 @@ public class AgentCharacter : BasicNavMeshAgent
             _isFollowing = value;
             _awarenessBehavior.IsFollowing = value;
         }
+    }
+
+    public bool IsInteractable
+    {
+        get => _isInteractable;
     }
 
     public bool CanInteract
@@ -141,6 +154,9 @@ public class AgentCharacter : BasicNavMeshAgent
         DetermineState();
 
         OnClosest();
+
+        if (!_player)
+            return;
 
         if (_isMarkedForKilling && _state == AgentState.Dead)
         {
@@ -336,13 +352,22 @@ public class AgentCharacter : BasicNavMeshAgent
 
     public void OnDrawGizmos()
     {
-        Gizmos.color = new Color(1, 0, 1, 0.4f);
-        Gizmos.DrawSphere(transform.position, _reachedDestination);
+        if (_displayReachedDestination)
+        {
+            Gizmos.color = new Color(1, 0, 1, 0.4f);
+            Gizmos.DrawSphere(transform.position, _reachedDestination);
+        }
 
-        Gizmos.color = new Color(0, 0, 1, 0.4f);
-        Gizmos.DrawSphere(transform.position, _playerDetectRadius);
-
-        Gizmos.color = new Color(1, 1, 1, 0.4f);
-        Gizmos.DrawSphere(_wanderDestination, 2f);
+        if (_displayPlayerDetectRadius)
+        {
+            Gizmos.color = new Color(0, 0, 1, 0.4f);
+            Gizmos.DrawSphere(transform.position, _playerDetectRadius);
+        }
+        
+        if (_displayWanderDestination)
+        {
+            Gizmos.color = new Color(1, 1, 1, 0.4f);
+            Gizmos.DrawSphere(_wanderDestination, 2f);
+        }
     }
 }

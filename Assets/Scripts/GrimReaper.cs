@@ -22,6 +22,9 @@ public class GrimReaper : BasicNavMeshAgent
     [Header("SceneManager")]
     [SerializeField] private SceneManager _sceneManager = null;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource _playerKillSFX = null;
+
     const string _playerTag = "Friendly";
 
     private float _currentTimer = 0f;
@@ -49,15 +52,6 @@ public class GrimReaper : BasicNavMeshAgent
 
         _playerCharacter = GameObject.FindObjectOfType<PlayerCharacter>();
         _sceneManager = GameObject.FindObjectOfType<SceneManager>();
-
-        //Debug.LogError($"scne is: {_sceneManager}");
-
-
-    }
-
-    protected void Start()
-    {
-      
     }
 
     private void Update()
@@ -81,7 +75,11 @@ public class GrimReaper : BasicNavMeshAgent
             _canKillPlayer = false;
 
             if (_playerCharacter)
+            {
+                _playerKillSFX.Play();
                 _playerCharacter.DestroyPlayer();
+            }
+               
 
             if (!_isGameOver)
                 Invoke("EndGame", 0.5f);

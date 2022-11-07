@@ -16,6 +16,8 @@ public class AwarenessBehavior : MonoBehaviour
     [SerializeField] private LayerMask _playerMask;
     [SerializeField] private Material _agentDeathMaterial;
 
+    [Header("Gizmos")]
+    [SerializeField] private bool _displayAgentInteractRadius = false;
 
     const string _playerTag = "Friendly";
 
@@ -130,9 +132,11 @@ public class AwarenessBehavior : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Gizmos.color = new Color(1, 1, 0, 0.4f);
-
-        Gizmos.DrawSphere(transform.position, _agentInteractRadius);
+        if (_displayAgentInteractRadius)
+        {
+            Gizmos.color = new Color(1, 1, 0, 0.4f);
+            Gizmos.DrawSphere(transform.position, _agentInteractRadius);
+        }
         
         if (!_player)
             return;
@@ -142,7 +146,5 @@ public class AwarenessBehavior : MonoBehaviour
         Vector3 target = _player.transform.position;
 
         Gizmos.DrawLine(origin, origin + ((target - origin).normalized * _crimeRayLength));
-
-        //Gizmos.DrawRay(TrackingOriginModeFlags  * _crimeRayLength);
     }
 }
