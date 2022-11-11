@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
@@ -13,17 +14,19 @@ public class AwarenessManager : MonoBehaviour
         Elimination
     }
 
-    [SerializeField] private float _publicAwareness = 0f;
-    [SerializeField] private AwarenessLevel _level = AwarenessLevel.Normal;
+    [Header("References")]
     [SerializeField] private GameObject _player = null;
     [SerializeField] private GameObject _grim = null;
-    [SerializeField] private AudioSource _securityIncreaseSound = null;
-    [SerializeField] private AudioSource _theme = null;
-    [SerializeField] private AudioSource _ambientNoise = null;
-    [SerializeField] private int _amountOnSeen = 5;
+
+    [Header("Settings")]
+    [SerializeField] private AwarenessLevel _level = AwarenessLevel.Normal;
+    [SerializeField] private int _awarenessAmountOnSeen = 5;
     [SerializeField] private float _randomThoughtTimer = 10f;
 
     [Header("Audio")]
+    [SerializeField] private AudioSource _securityIncreaseSound = null;
+    [SerializeField] private AudioSource _theme = null;
+    [SerializeField] private AudioSource _cityWhiteNoise = null;
     [SerializeField] [Range(0, 1f)] private float _maxThemeVolume = 1f;
     [SerializeField] [Range(0, 0.05f)] private float _themeStep = 0.005f;
 
@@ -31,30 +34,40 @@ public class AwarenessManager : MonoBehaviour
     [SerializeField] private ChatBillboard _chatBillboard;
     [SerializeField] private bool _playerThoughtsEnabled = true;
 
+    // Compile time strings
     const string _playerTag = "Friendly";
     const string _agentTag = "Agent";
     const string _grimTag = "Enemy";
 
+    // Agents to keep track of, these will forward any crime
     private List<AgentCharacter> _agents = new List<AgentCharacter>();
-    private GrimReaper _reaper = null;
-    private Vignette _ppp;
-    private bool _isPlayingTheme = false;
 
+    // Grim reaper script to set new corpse target
+    private GrimReaper _reaper = null;
+
+    // Used to control the public awareness vignette
+    private Vignette _vignette = null;
+
+    private bool _isPlayingTheme = false;
+    private float _publicAwareness = 0f;
+
+    // Counter for random thoughts
     private float _currentRandomThoughtTimer = 0f;
 
+    // Random thoughts to display above player
     private List<string> _randomThoughts = new List<string>();
 
     void Awake()
     {
         _player = GameObject.FindGameObjectWithTag(_playerTag);
         _grim = GameObject.FindGameObjectWithTag(_grimTag);
-        _ppp = Camera.main.gameObject.GetComponent<PostProcessVolume>().profile.GetSetting<Vignette>();
-        _ambientNoise.Play();
+        _vignette = Camera.main.gameObject.GetComponent<PostProcessVolume>().profile.GetSetting<Vignette>();
 
-        GameObject[] agents = GameObject.FindGameObjectsWithTag(_agentTag);
+        // Play the white noise city sounds
+        _cityWhiteNoise.Play();
 
-        foreach (GameObject agent in agents)
-            _agents.Add(agent.GetComponent<AgentCharacter>());
+        // Gather all agents
+        _agents = GameObject.FindObjectsOfType<AgentCharacter>().ToList<AgentCharacter>();
 
         if (!_player)
             throw new UnityException("Could not find player");
@@ -62,7 +75,7 @@ public class AwarenessManager : MonoBehaviour
         if (_grim)
             _reaper = _grim.GetComponent<GrimReaper>();
 
-        if (!_ppp)
+        if (!_vignette)
             throw new UnityException("Could not find post-process volume");
 
         PopulateRandomThoughts();
@@ -88,7 +101,7 @@ public class AwarenessManager : MonoBehaviour
 
     private void IncreaseAwareness()
     {
-        _publicAwareness += _amountOnSeen;
+        _publicAwareness += _awarenessAmountOnSeen;
     }
 
     private void DecreaseAwareness(int amount)
@@ -160,7 +173,7 @@ public class AwarenessManager : MonoBehaviour
 
         while (vignetteLevel <= 0.17f)
         {
-            _ppp.intensity.value += Time.deltaTime;
+            _vignette.intensity.value += Time.deltaTime;
             vignetteLevel += Time.deltaTime;
 
             yield return new WaitForSeconds(0.05f);

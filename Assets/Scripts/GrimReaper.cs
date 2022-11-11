@@ -18,6 +18,7 @@ public class GrimReaper : BasicNavMeshAgent
     [SerializeField] private float _collectRadius = 3f;
     [SerializeField] private float _killRadius = 5f;
     [SerializeField] private float _heinSpeedIncrease = 0.5f;
+    [SerializeField] private float _speedIncreaseEveryXSeconds = 10f;
 
     [Header("SceneManager")]
     [SerializeField] private SceneManager _sceneManager = null;
@@ -28,6 +29,7 @@ public class GrimReaper : BasicNavMeshAgent
     const string _playerTag = "Friendly";
 
     private float _currentTimer = 0f;
+    private float _speedIncreaseCurrentTimer = 0f;
     private PlayerCharacter _playerCharacter;
 
     private bool _canKillPlayer = true;
@@ -54,8 +56,21 @@ public class GrimReaper : BasicNavMeshAgent
         _sceneManager = GameObject.FindObjectOfType<SceneManager>();
     }
 
+    private void OnSpeedIncrease()
+    {
+        _speedIncreaseCurrentTimer += Time.deltaTime;
+        if (_speedIncreaseCurrentTimer >= _speedIncreaseEveryXSeconds)
+        {
+            _agent.speed += _heinSpeedIncrease;
+            _speedIncreaseCurrentTimer = 0f;
+        }
+    }
+
     private void Update()
     {
+        // Increases Hein speed automatically;
+        OnSpeedIncrease();
+
         if (!_playerCharacter)
             return;
 

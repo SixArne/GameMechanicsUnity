@@ -573,7 +573,7 @@ GameObject:
   - component: {fileID: 1566566283}
   - component: {fileID: 7254820405791828822}
   m_Layer: 7
-  m_Name: Agent
+  m_Name: PA_Agent
   m_TagString: Agent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 844425326269279161}
   - component: {fileID: 1443497351}
   m_Layer: 0
-  m_Name: Awareness
+  m_Name: AwarenessManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,9 +54,12 @@ MonoBehaviour:
   _securityIncreaseSound: {fileID: 2259059107665557291}
   _theme: {fileID: 844425326269279161}
   _ambientNoise: {fileID: 1443497351}
-  _amountOnSeen: 5
+  _amountOnSeen: 2
+  _randomThoughtTimer: 10
   _maxThemeVolume: 1
   _themeStep: 0.005
+  _chatBillboard: {fileID: 0}
+  _playerThoughtsEnabled: 1
 --- !u!82 &2259059107665557291
 AudioSource:
   m_ObjectHideFlags: 0

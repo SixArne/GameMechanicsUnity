@@ -13469,7 +13469,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1198694644254768985, guid: 2a5df2a423796d64999e4844a29a066b, type: 3}
       propertyPath: _spawnAmount
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1198694644254768985, guid: 2a5df2a423796d64999e4844a29a066b, type: 3}
       propertyPath: _spawnDistanceMax
@@ -22512,7 +22512,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1198694644254768985, guid: 2a5df2a423796d64999e4844a29a066b, type: 3}
       propertyPath: _spawnAmount
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1198694644254768985, guid: 2a5df2a423796d64999e4844a29a066b, type: 3}
       propertyPath: _spawnDistanceMax
@@ -35801,15 +35801,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4925075839790429545, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 56.876232
+      value: 116.847946
       objectReference: {fileID: 0}
     - target: {fileID: 4925075839790429545, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.9999962
+      value: -1.9999924
       objectReference: {fileID: 0}
     - target: {fileID: 4925075839790429545, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -8.808426
+      value: -14.6
       objectReference: {fileID: 0}
     - target: {fileID: 4925075839790429545, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -35844,8 +35844,20 @@ PrefabInstance:
       value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 5017502459198778088, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
+      propertyPath: m_AutoBraking
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5017502459198778088, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
+      propertyPath: m_Acceleration
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5017502459198778088, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
       propertyPath: m_AngularSpeed
       value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 5017502459198778088, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6582375946173154592, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
       propertyPath: m_Name
@@ -36037,8 +36049,17 @@ PrefabInstance:
       propertyPath: _chatBillboard
       value: 
       objectReference: {fileID: 3327023018968213914}
+    - target: {fileID: 5091563684729779716, guid: be481c9c0b654104997cb9855299938c, type: 3}
+      propertyPath: _cityWhiteNoise
+      value: 
+      objectReference: {fileID: 5091563683957633921}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be481c9c0b654104997cb9855299938c, type: 3}
+--- !u!82 &5091563683957633921 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 1443497351, guid: be481c9c0b654104997cb9855299938c, type: 3}
+  m_PrefabInstance: {fileID: 5091563683957633920}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7235677327073888239
 PrefabInstance:
   m_ObjectHideFlags: 0

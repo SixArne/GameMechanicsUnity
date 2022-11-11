@@ -6,27 +6,32 @@ using UnityEngine.AI;
 [RequireComponent(typeof(VisionCone))]
 public class AgentCharacter : BasicNavMeshAgent
 {
-    [SerializeField] private float _wanderDistance = 5f;
-    [SerializeField] private float _reachedDestination = 5f;
-    [SerializeField] private ParticleSystem _DeathParticle;
-    [SerializeField] private GameObject _visuals;
+    [Header("Materials")]
     [SerializeField] private Material _DeathMaterial;
     [SerializeField] private Material _FollowMaterial;
     [SerializeField] private Material _NormalMaterial;
-    [SerializeField] readonly private float _wanderMaxCooldown = 5f;
-    [SerializeField] private float _blindEyeCooldown = 60f;
-    [SerializeField] AgentState _state = AgentState.Wander;
-    [SerializeField] float _playerDetectRadius = 10f;
-    [SerializeField] LayerMask _playerMask;
+    [SerializeField] private ParticleSystem _DeathParticle;
+
+    [Header("References")]
+    [SerializeField] private GameObject _visuals;
+
+    [Header("Settings")]
     [SerializeField] float _normalSpeed = 0f;
     [SerializeField] float _fleeSpeed = 5f;
+    [SerializeField] readonly private float _wanderMaxCooldown = 5f;
+    [SerializeField] readonly private float _blindEyeCooldown = 60f;
+    [SerializeField] private float _wanderDistance = 5f;
+    [SerializeField] private float _reachedDestination = 5f;
+    [SerializeField] float _playerDetectRadius = 10f;
+    [SerializeField] AgentState _state = AgentState.Wander;
+    [SerializeField] LayerMask _playerMask;
 
     [Header("Gizmos")]
     [SerializeField] bool _displayPlayerDetectRadius = false;
     [SerializeField] bool _displayReachedDestination = false;
     [SerializeField] bool _displayWanderDestination = false;
 
-    [Header("Settings")]
+    [Header("Settings --")]
     [SerializeField] [Tooltip("Disabling this will disable its update loop entirely")] bool _isInteractable = true;
 
     private bool _hasReachedDestination = false;
@@ -70,6 +75,7 @@ public class AgentCharacter : BasicNavMeshAgent
         _agent.speed = _normalSpeed;
     }
 
+    #region GetSet
     public bool IsFollowing
     {
         get => _isFollowing;
@@ -141,6 +147,7 @@ public class AgentCharacter : BasicNavMeshAgent
             _awarenessBehavior.CanFollow = false;
         }
     }
+    #endregion
 
     void Start()
     {

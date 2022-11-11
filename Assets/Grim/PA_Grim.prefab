@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 3648341322295963995}
   - component: {fileID: -6493686611952877999}
   m_Layer: 7
-  m_Name: Grim
+  m_Name: PA_Grim
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

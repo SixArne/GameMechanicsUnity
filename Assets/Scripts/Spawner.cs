@@ -13,6 +13,8 @@ public class Spawner : MonoBehaviour
 
     [SerializeField] [Range(0, 1)] private float _gizmosOpacity = 0.5f;
 
+    private List<GameObject> _spawnedAgents = new List<GameObject>();
+
     void Awake()
     {
         NavMeshAgent navMeshComp = _prefab.GetComponent<NavMeshAgent>();
@@ -38,7 +40,7 @@ public class Spawner : MonoBehaviour
 
             NavMeshHit hit;
             if (NavMesh.SamplePosition(spawnPosition, out hit, 100f, NavMesh.AllAreas)){
-                Instantiate(_prefab, hit.position, Quaternion.identity);
+                _spawnedAgents.Add(Instantiate(_prefab, hit.position, Quaternion.identity));
             }
         }
     }
