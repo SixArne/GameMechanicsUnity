@@ -18,10 +18,11 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private float _agentKillMessageRadius = 2f;
 
     private const string _runMessage = "I should run...";
-    private const string _tooManyPeopleMessage = "To many people here... Need to lure him away";
+    private const string _tooManyPeopleMessage = "Better make sure nobody notices";
     private const string _needToKillFirst = "Grim will be here soon... I need a distraction";
     private const string _perfectMessage = "This will do as a distraction...";
-    private const string _followMessage = "Maybe I should lure them to a quit place next time...";
+    private const string _followMessage = "Interesting... He only has eyes for fresh bodies...";
+    private const string _almostDone = "I should go before he's done";
     private bool _hasRegisteredDeath = false;
     private bool _isInAgentRadius = false;
 
@@ -34,21 +35,23 @@ public class TutorialManager : MonoBehaviour
             _chatbox.SetText(_needToKillFirst);
         }
 
-        float distanceToAgentSquared = (_agentCharacter.transform.position - _playerCharacter.transform.position).sqrMagnitude;
-        float agentKillRadiusSquared = _agentKillMessageRadius * _agentKillMessageRadius;
-        if (distanceToAgentSquared <= agentKillRadiusSquared &&
-            _agentCharacter.State != AgentCharacter.AgentState.Dead &&
-            !_isInAgentRadius)
+        if (_agentCharacter)
         {
-            _isInAgentRadius = true;
-            _chatbox.SetText(_perfectMessage);
-            StartCoroutine("DisplayHelpMessage", new object[3] { _tooManyPeopleMessage, 3f, 0.5f });
+            float distanceToAgentSquared = (_agentCharacter.transform.position - _playerCharacter.transform.position).sqrMagnitude;
+            float agentKillRadiusSquared = _agentKillMessageRadius * _agentKillMessageRadius;
+            if (distanceToAgentSquared <= agentKillRadiusSquared &&
+                _agentCharacter.State != AgentCharacter.AgentState.Dead &&
+                !_isInAgentRadius)
+            {
+                _isInAgentRadius = true;
+                _chatbox.SetText(_perfectMessage);
+                StartCoroutine("DisplayHelpMessage", new object[3] { _tooManyPeopleMessage, 3f, 1.0f });
+            }
+            else if (distanceToAgentSquared > agentKillRadiusSquared)
+            {
+                _isInAgentRadius = false;
+            }
         }
-        else if (distanceToAgentSquared > agentKillRadiusSquared)
-        {
-            _isInAgentRadius = false;
-        }
-
 
         if (_agentCharacter.State == AgentCharacter.AgentState.Dead && !_hasRegisteredDeath)
         {
@@ -62,7 +65,8 @@ public class TutorialManager : MonoBehaviour
 
             _chatbox.SetText(_runMessage, 1f);
             // message showtime and show delay
-            StartCoroutine("DisplayHelpMessage", new object[3] { _followMessage, 3f, 0.5f });
+            StartCoroutine("DisplayHelpMessage", new object[3] { _followMessage, 2f, 1.5f });
+            StartCoroutine("DisplayHelpMessage", new object[3] { _almostDone, 3f, 4.0f });
         }
     }
 

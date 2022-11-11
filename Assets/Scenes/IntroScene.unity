@@ -14135,6 +14135,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5091563684729779716, guid: be481c9c0b654104997cb9855299938c, type: 3}
+      propertyPath: _chatBillboard
+      value: 
+      objectReference: {fileID: 2140874474}
+    - target: {fileID: 5091563684729779716, guid: be481c9c0b654104997cb9855299938c, type: 3}
+      propertyPath: _playerThoughtsEnabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be481c9c0b654104997cb9855299938c, type: 3}
 --- !u!1001 &6226805613034765965

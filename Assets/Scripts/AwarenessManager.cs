@@ -21,10 +21,15 @@ public class AwarenessManager : MonoBehaviour
     [SerializeField] private AudioSource _theme = null;
     [SerializeField] private AudioSource _ambientNoise = null;
     [SerializeField] private int _amountOnSeen = 5;
+    [SerializeField] private float _randomThoughtTimer = 10f;
 
     [Header("Audio")]
     [SerializeField] [Range(0, 1f)] private float _maxThemeVolume = 1f;
     [SerializeField] [Range(0, 0.05f)] private float _themeStep = 0.005f;
+
+    [Header("Player thoughts")]
+    [SerializeField] private ChatBillboard _chatBillboard;
+    [SerializeField] private bool _playerThoughtsEnabled = true;
 
     const string _playerTag = "Friendly";
     const string _agentTag = "Agent";
@@ -34,6 +39,10 @@ public class AwarenessManager : MonoBehaviour
     private GrimReaper _reaper = null;
     private Vignette _ppp;
     private bool _isPlayingTheme = false;
+
+    private float _currentRandomThoughtTimer = 0f;
+
+    private List<string> _randomThoughts = new List<string>();
 
     void Awake()
     {
@@ -55,6 +64,16 @@ public class AwarenessManager : MonoBehaviour
 
         if (!_ppp)
             throw new UnityException("Could not find post-process volume");
+
+        PopulateRandomThoughts();
+    }
+
+    void PopulateRandomThoughts()
+    {
+        _randomThoughts.Add("I better act carefull... don't want Grim and the police chasing me");
+        _randomThoughts.Add("Will I be able to eat tonight?");
+        _randomThoughts.Add("Does Grim have a family?");
+        _randomThoughts.Add("Maybe I can make some people follow me in an alley");
     }
 
     public AwarenessLevel Level
@@ -164,9 +183,22 @@ public class AwarenessManager : MonoBehaviour
         }
     }
 
+    private void RandomThought()
+    {
+        int random = Random.Range(0, _randomThoughts.Count);
+        _chatBillboard.SetText(_randomThoughts[random], 3f);
+    }
+
     private void Update()
     {
         MonitorPublicAwareness();
+
+        _currentRandomThoughtTimer += Time.deltaTime;
+        if (_currentRandomThoughtTimer >= _randomThoughtTimer && _playerThoughtsEnabled)
+        {
+            RandomThought();
+            _currentRandomThoughtTimer = 0f;
+        }
 
         foreach (AgentCharacter agent in _agents)
         {

@@ -14,7 +14,7 @@ public class ChatBillboard : MonoBehaviour
         StopCoroutine("DisableCanvas");
         _canvas.enabled = true;
         _placeholder.SetText(message);
-        StartCoroutine("DisableCanvas");
+        StartCoroutine("DisableCanvas", _appearTime);
     }
 
     public void SetText(string message, float appearTime)

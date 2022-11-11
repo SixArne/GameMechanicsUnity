@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028386, g: 0.22571427, b: 0.3069231, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -35773,6 +35773,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c9775e7f31902a4baeb4835f8a1728e, type: 3}
+--- !u!114 &3327023018968213914 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5930576153166156859, guid: 3c9775e7f31902a4baeb4835f8a1728e, type: 3}
+  m_PrefabInstance: {fileID: 3327023018968213913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140874467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54b9cea096b2a3e418bf89b0a4d83972, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3648341322295963993
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35827,6 +35838,10 @@ PrefabInstance:
     - target: {fileID: 4925075839790429545, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5017502459198778088, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
+      propertyPath: m_Speed
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 5017502459198778088, guid: 1e0346eb5c427e84bb908ed50a62c5c5, type: 3}
       propertyPath: m_AngularSpeed
@@ -36018,6 +36033,10 @@ PrefabInstance:
       propertyPath: _grim
       value: 
       objectReference: {fileID: 3648341322295963994}
+    - target: {fileID: 5091563684729779716, guid: be481c9c0b654104997cb9855299938c, type: 3}
+      propertyPath: _chatBillboard
+      value: 
+      objectReference: {fileID: 3327023018968213914}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be481c9c0b654104997cb9855299938c, type: 3}
 --- !u!1001 &7235677327073888239
