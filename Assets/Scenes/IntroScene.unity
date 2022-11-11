@@ -12938,6 +12938,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1671360925, guid: 18b700f0c5793664b824c88851e0b04c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4978672552995074779, guid: 18b700f0c5793664b824c88851e0b04c, type: 3}
       propertyPath: _displayAgentInteractRadius
       value: 0
@@ -13801,6 +13805,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54b9cea096b2a3e418bf89b0a4d83972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2140874479 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8576534884040877672, guid: 3c9775e7f31902a4baeb4835f8a1728e, type: 3}
+  m_PrefabInstance: {fileID: 3327023018968213913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140874467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e1d3121eee6bbb4fa1a8e98af665e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1131432840685381474
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13930,6 +13945,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2281651924569929374, guid: 3c9775e7f31902a4baeb4835f8a1728e, type: 3}
+      propertyPath: m_SortingOrder
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3198150092582144470, guid: 3c9775e7f31902a4baeb4835f8a1728e, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -14047,6 +14066,14 @@ PrefabInstance:
       propertyPath: _agentCharacter
       value: 
       objectReference: {fileID: 303639545}
+    - target: {fileID: 4497888411749911499, guid: 9e63e2a6e51fc194090d36189295c005, type: 3}
+      propertyPath: _playerCharacter
+      value: 
+      objectReference: {fileID: 2140874479}
+    - target: {fileID: 4497888411749911499, guid: 9e63e2a6e51fc194090d36189295c005, type: 3}
+      propertyPath: _wallHelpMessageRadius
+      value: 2.89
+      objectReference: {fileID: 0}
     - target: {fileID: 4497888411749911501, guid: 9e63e2a6e51fc194090d36189295c005, type: 3}
       propertyPath: m_Name
       value: TutorialManager

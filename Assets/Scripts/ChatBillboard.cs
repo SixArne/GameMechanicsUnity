@@ -17,9 +17,18 @@ public class ChatBillboard : MonoBehaviour
         StartCoroutine("DisableCanvas");
     }
 
-    private IEnumerator DisableCanvas()
+    public void SetText(string message, float appearTime)
     {
-        yield return new WaitForSeconds(_appearTime);
+        // Disable if running
+        StopCoroutine("DisableCanvas");
+        _canvas.enabled = true;
+        _placeholder.SetText(message);
+        StartCoroutine("DisableCanvas", appearTime);
+    }
+
+    private IEnumerator DisableCanvas(float appearTime = 2f)
+    {
+        yield return new WaitForSeconds(appearTime);
         _canvas.enabled = false;
     }
 }

@@ -70,7 +70,7 @@ public class GrimReaper : BasicNavMeshAgent
         }
 
         Vector3 transformPosition = _playerCharacter.transform.position - transform.position;
-        if (transformPosition.sqrMagnitude <= _killRadius * _killRadius && _canKillPlayer)
+        if (transformPosition.sqrMagnitude <= _killRadius * _killRadius && _canKillPlayer && _state == GrimState.Chasing)
         {
             _canKillPlayer = false;
 
