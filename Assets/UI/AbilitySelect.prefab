@@ -568,7 +568,7 @@ MonoBehaviour:
   _abilities:
   - {fileID: 11400000, guid: 38bd5476159e87c438c60bfb1cf51c55, type: 2}
   - {fileID: 11400000, guid: 7371ff7275620e0498cee9fcd59eece0, type: 2}
-  - {fileID: 11400000, guid: 7371ff7275620e0498cee9fcd59eece0, type: 2}
+  - {fileID: 11400000, guid: 9dde243785da50f4aacdcc81f4890849, type: 2}
   _cards:
   - {fileID: 8399763456457212198}
   - {fileID: 3136384016762938649}

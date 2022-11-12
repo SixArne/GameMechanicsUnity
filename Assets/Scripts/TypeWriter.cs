@@ -10,7 +10,7 @@ public class TypeWriter : MonoBehaviour
     [SerializeField] private float _lineDelay = 2.0f;
     [SerializeField] private Canvas _canvas;
     [SerializeField] private List<TMPro.TMP_Text> _lineHoldersText = new List<TMPro.TMP_Text>();
-    [SerializeField] private SceneManager _sceneManager;
+    [SerializeField] private CustomSceneManager _sceneManager;
 
     private List<string> _lines = new List<string>();
 

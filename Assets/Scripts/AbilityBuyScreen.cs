@@ -14,14 +14,14 @@ public class AbilityBuyScreen : MonoBehaviour
     
     private List<AbilityCard> _abilityCards = new List<AbilityCard>();
     private Gamemode _gamemode; // Holds data about game state
-    private SceneManager _sceneManager;
+    private CustomSceneManager _sceneManager;
     
 
     private void Awake()
     {
         // Get gamemode reference
         _gamemode = GameObject.FindObjectOfType<Gamemode>();
-        _sceneManager = GameObject.FindObjectOfType<SceneManager>();
+        _sceneManager = GameObject.FindObjectOfType<CustomSceneManager>();
     }
 
     void Start()

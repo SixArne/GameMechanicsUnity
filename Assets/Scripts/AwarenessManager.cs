@@ -13,14 +13,11 @@ public class AwarenessManager : MonoBehaviour
         HighAlert,
     }
 
-    [Header("References")]
-    [SerializeField] private GameObject _player = null;
-    [SerializeField] private GameObject _grim = null;
-
     [Header("Settings")]
     [SerializeField] private AwarenessLevel _level = AwarenessLevel.Normal;
     [SerializeField] private int _awarenessAmountOnSeen = 5;
     [SerializeField] private float _randomThoughtTimer = 10f;
+    [SerializeField] private bool _canIgnoreGrim = false;
 
     [Header("Audio")]
     [SerializeField] private AudioSource _securityIncreaseMildSFX = null;
@@ -63,29 +60,27 @@ public class AwarenessManager : MonoBehaviour
 
     void Start()
     {
-        _player = GameObject.FindGameObjectWithTag(_playerTag);
-        _grim = GameObject.FindGameObjectWithTag(_grimTag);
+        _playerCharacter = GameObject.FindObjectOfType<PlayerCharacter>();
+        if (!_playerCharacter)
+            throw new UnityException("Could not find player character");
+
+        _reaper = GameObject.FindObjectOfType<GrimReaper>();
+        if (!_reaper && !_canIgnoreGrim)
+            throw new UnityException("Could not find reaper script");
+
+        _chatBillboard = _playerCharacter.gameObject.GetComponent<ChatBillboard>();
+        if (!_chatBillboard)
+            throw new UnityException("Could not find chat board");
+
         _vignette = Camera.main.gameObject.GetComponent<PostProcessVolume>().profile.GetSetting<Vignette>();
-        
+        if (!_vignette)
+            throw new UnityException("Could not find post-process volume");
 
         // Play the white noise city sounds
         _cityWhiteNoise.Play();
 
         // Gather all agents
         _agents = GameObject.FindObjectsOfType<AgentCharacter>().ToList<AgentCharacter>();
-
-        if (!_player)
-            throw new UnityException("Could not find player");
-
-        // Get board after getting player
-        _chatBillboard = _player.GetComponent<ChatBillboard>();
-        _playerCharacter = _player.GetComponent<PlayerCharacter>();
-
-        if (_grim)
-            _reaper = _grim.GetComponent<GrimReaper>();
-
-        if (!_vignette)
-            throw new UnityException("Could not find post-process volume");
 
         PopulateRandomThoughts();
     }
@@ -221,6 +216,9 @@ public class AwarenessManager : MonoBehaviour
 
     private void RandomThought()
     {
+        if (!_chatBillboard)
+            return; // exit early if chatboard is gone
+
         int random = Random.Range(0, _randomThoughts.Count);
         _chatBillboard.SetText(_randomThoughts[random], 3f);
     }
@@ -254,7 +252,7 @@ public class AwarenessManager : MonoBehaviour
         }
     }
 
-    #region Amensia ability
+    #region Amnesia ability
     public void MakeAllAgentsBlind(float duration)
     {
         foreach (AgentCharacter agent in _agents)

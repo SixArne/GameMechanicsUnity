@@ -1,8 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.VersionControl;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class TutorialManager : MonoBehaviour
 {
@@ -28,6 +25,11 @@ public class TutorialManager : MonoBehaviour
 
     private void Update()
     {
+        if (!_playerCharacter)
+        {
+            throw new UnityException("Player is gone??");
+        }
+
         float distanceToWallSquared = (_progressWall.transform.position - _playerCharacter.transform.position).sqrMagnitude;
         float wallRadiusSquared = _wallHelpMessageRadius * _wallHelpMessageRadius;
         if (_progressWall.enabled && distanceToWallSquared <= wallRadiusSquared)

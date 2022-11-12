@@ -1,20 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEditor.SearchService;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Scene = UnityEngine.SceneManagement.Scene;
 
 public class Gamemode : MonoBehaviour
 {
-    [SerializeField]
-    [Tooltip("List of suitable scenes to pick from (drag all scenes on this to fill all in)")]
-    private SceneAsset _scene;
-
-    [SerializeField]
-    [Tooltip("Scenemanager in level")]
-    private SceneManager _sceneManager;
+    private const string _levelname = "BuyScene";
 
     [SerializeField]
     [Tooltip("The number of people to kill by end of level")]
@@ -108,10 +100,9 @@ public class Gamemode : MonoBehaviour
     private IEnumerator OnLevelCompleted()
     {
         yield return new WaitForSeconds(_endLevelDelaySeconds);
-  
-        // Because this is persistent we need to manually set it to false again.
+
+        SceneManager.LoadScene(_levelname);
         _levelHasEnded = false;
-        _sceneManager.LoadScene(_scene.name);
     }
 
     private void IncreaseDifficulty()

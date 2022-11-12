@@ -647,12 +647,12 @@ MonoBehaviour:
   _blindEyeCooldown: 60
   _wanderDistance: 20
   _reachedDestination: 3.07
-  _playerDetectRadius: 10
+  _playerDetectRadius: 20
   _state: 0
   _playerMask:
     serializedVersion: 2
     m_Bits: 64
-  _displayPlayerDetectRadius: 0
+  _displayPlayerDetectRadius: 1
   _displayReachedDestination: 0
   _displayWanderDestination: 0
   _isInteractable: 1

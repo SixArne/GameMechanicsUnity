@@ -5,7 +5,7 @@ using UnityEngine;
 public class NextLevelField : MonoBehaviour
 {
     // Start is called before the first frame update
-    [SerializeField] private SceneManager _sceneManager;
+    [SerializeField] private CustomSceneManager _sceneManager;
     [SerializeField] private string _levelToLoad;
 
     const string _playerTag = "Friendly";

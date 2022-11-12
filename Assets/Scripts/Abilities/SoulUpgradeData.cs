@@ -9,6 +9,7 @@ public class SoulUpgradeData : ScriptableObject
     {
         OnDead,
         OnAwareness,
+        OnEndGame
     }
 
     public string upgradeName;

@@ -231,7 +231,7 @@ GameObject:
   - component: {fileID: 3987522294533718619}
   m_Layer: 6
   m_Name: Visuals
-  m_TagString: Friendly
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 8893900686762049698}
   m_Layer: 6
   m_Name: Canvas
-  m_TagString: Friendly
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -565,7 +565,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _interactRadius: 5
-  _killCooldown: 10
+  _killCooldown: 15
   _DeathMaterial: {fileID: 2100000, guid: 84d741f486e16634996eabb3dc098d8d, type: 2}
   _Visuals: {fileID: 4111096496824664197}
   _deathParticle: {fileID: 7747941317979891448, guid: 099b98186dbf84f44bf71ea39e3f0b69, type: 3}

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a058620ec2f3e0746a684ca2e80d90bf, type: 3}
+  m_Name: UltimateDeath
+  m_EditorClassIdentifier: 
+  upgradeName: Grim poison
+  upgradeDescriptionn: 'The first body you kill wil kill the grim reaper...
+
+    however
+    only one can be found'
+  upgradeCost: 30
+  abilityType: 2
+  abilityScript: {fileID: 5815163597310305230, guid: e230d476491d42a47b35ed9b68cf6b78, type: 3}

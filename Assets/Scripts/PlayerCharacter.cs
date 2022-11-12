@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Build;
 using UnityEngine;
 
 public class PlayerCharacter : BasicCharacter
@@ -170,6 +168,9 @@ public class PlayerCharacter : BasicCharacter
 
             AgentCharacter agentCharacter = collider.gameObject.GetComponentInParent<AgentCharacter>();
 
+            if (!agentCharacter)
+                return;
+
             if (!agentCharacter.IsInteractable)
                 return;
 
@@ -183,6 +184,14 @@ public class PlayerCharacter : BasicCharacter
 
             if (hasPressedKill && _canKill)
             {
+                if (!_hasUsedAbility && _abilityData && _abilityData.abilityType == SoulUpgradeData.AbilityType.OnEndGame)
+                {
+                    // Execute ability on the player.
+                    _abilityData.abilityScript.OnExecute();
+
+                    StartCoroutine("EndGame", 10f);
+                }
+
                 agentCharacter.State = AgentCharacter.AgentState.Dead;
                 agentCharacter.IsMarkedForKilling = true;
                 _canKill = false;
@@ -223,6 +232,12 @@ public class PlayerCharacter : BasicCharacter
         {
             _closestId = 0;
         }
+    }
+
+    private IEnumerator EndGame(float time)
+    {
+        yield return new WaitForSeconds(time);
+        GameObject.FindObjectOfType<CustomSceneManager>().MenuScene();
     }
 
     public void DestroyPlayer()

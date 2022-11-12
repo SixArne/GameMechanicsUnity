@@ -186,6 +186,9 @@ public class AgentCharacter : BasicNavMeshAgent
 
     public void Update()
     {
+        //if (_isReaped)
+        //    Destroy(gameObject);
+
         HandleCoolDowns();
 
         DetermineState();
@@ -318,20 +321,11 @@ public class AgentCharacter : BasicNavMeshAgent
 
     protected override void Flee()
     {
-        if (_hasReachedDestination)
+        if ((_player.transform.position - transform.position).sqrMagnitude <= _fleeDistance * _fleeDistance)
         {
-            if ((_player.transform.position - transform.position).sqrMagnitude <= _fleeDistance * _fleeDistance)
-            {
-                // calculate new dest
-                _hasReachedDestination = false;
-                CalculateFleeDestination();
-            }
-            else
-            {
-                _state = AgentState.Wander;
-                _agent.speed = _normalSpeed;
-                CalculateWanderDestination();
-            }
+            // calculate new dest
+            _hasReachedDestination = false;
+            CalculateFleeDestination();
         }
 
         if ((_wanderDestination - transform.position).sqrMagnitude <= _reachedDestination * _reachedDestination)
@@ -339,6 +333,15 @@ public class AgentCharacter : BasicNavMeshAgent
             _hasReachedDestination = true;
             return;
         }
+
+        if (_hasReachedDestination)
+        {
+            _state = AgentState.Wander;
+            _agent.speed = _normalSpeed;
+            CalculateWanderDestination();
+        }
+
+        
 
         _target = _wanderDestination;
         base.Seek();

@@ -13,14 +13,23 @@ public class PlayerAndReaperSpawner : MonoBehaviour
     
     void Awake()
     {
-        int reaperSpawnIndex = Random.Range(0, _reaperSpawnPoints.Count);
-        int playerSpawnIndex = Random.Range(0, _playerSpawnPoints.Count);
+        SpawnPlayer();
+        SpawnReaper();
+    }
 
-        Vector3 reaperSpawnLocation = _reaperSpawnPoints[reaperSpawnIndex].position;
+    private void SpawnPlayer()
+    {
+        int playerSpawnIndex = Random.Range(0, _playerSpawnPoints.Count);
         Vector3 playerSpawnLocation = _playerSpawnPoints[playerSpawnIndex].position;
 
         // Instantiate player
         Instantiate(_playerPrefab, playerSpawnLocation, Quaternion.identity);
+    }
+
+    private void SpawnReaper()
+    {
+        int reaperSpawnIndex = Random.Range(0, _reaperSpawnPoints.Count);
+        Vector3 reaperSpawnLocation = _reaperSpawnPoints[reaperSpawnIndex].position;
 
         NavMeshHit navMeshHit;
         if (NavMesh.SamplePosition(reaperSpawnLocation, out navMeshHit, 100f, NavMesh.AllAreas))
@@ -32,7 +41,5 @@ public class PlayerAndReaperSpawner : MonoBehaviour
         GameObject reaper = Instantiate(_reaperPrefab, reaperSpawnLocation, Quaternion.identity);
         GrimReaper reaperLogic = reaper.GetComponent<GrimReaper>();
         reaperLogic.State = GrimReaper.GrimState.Chasing;
-
-       
     }
 }

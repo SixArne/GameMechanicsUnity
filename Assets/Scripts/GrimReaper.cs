@@ -23,7 +23,7 @@ public class GrimReaper : BasicNavMeshAgent
     [SerializeField] private float _speedIncreaseEveryXSeconds = 10f;
 
     [Header("SceneManager")]
-    [SerializeField] private SceneManager _sceneManager = null;
+    [SerializeField] private CustomSceneManager _sceneManager = null;
 
     [Header("Audio")]
     [SerializeField] private AudioSource _playerKillSFX = null;
@@ -65,7 +65,7 @@ public class GrimReaper : BasicNavMeshAgent
     private void Start()
     {
         _playerCharacter = GameObject.FindObjectOfType<PlayerCharacter>();
-        _sceneManager = GameObject.FindObjectOfType<SceneManager>();
+        _sceneManager = GameObject.FindObjectOfType<CustomSceneManager>();
         _gamemode = GameObject.FindObjectOfType<Gamemode>();
         _chatBillBoard = GetComponent<ChatBillboard>();
     }
@@ -101,21 +101,6 @@ public class GrimReaper : BasicNavMeshAgent
 
     private void Update()
     {
-        if (!_hasPlayedLevelEndAnimation && _gamemode.LevelHasEnded)
-        {
-            TeleportToPlayer();
-            Instantiate(_teleportParticle, transform.position, transform.rotation);
-            _chatBillBoard.SetText(_levelEndMessage, 3f);
-            _hasPlayedLevelEndAnimation = true;
-            _agent.isStopped = true; // Prevent grim from walking
-        }
-
-        if (_gamemode.LevelHasEnded)
-        {
-            return; // Disable Grim reaper on level end.
-        }
-             
-
         // Increases Hein speed automatically;
         OnSpeedIncrease();
 
@@ -132,6 +117,25 @@ public class GrimReaper : BasicNavMeshAgent
                 break;
         }
 
+        if (!_hasPlayedLevelEndAnimation && _gamemode.LevelHasEnded)
+        {
+            TeleportToPlayer();
+            Instantiate(_teleportParticle, transform.position, transform.rotation);
+            _chatBillBoard.SetText(_levelEndMessage, 3f);
+            _hasPlayedLevelEndAnimation = true;
+            _agent.isStopped = true; // Prevent grim from walking
+        }
+
+        if (_gamemode.LevelHasEnded)
+        {
+            return; // Disable Grim reaper on level end.
+        }
+
+        CheckTouchPlayer();
+    }
+
+    private void CheckTouchPlayer()
+    {
         Vector3 transformPosition = _playerCharacter.transform.position - transform.position;
         if (transformPosition.sqrMagnitude <= _killRadius * _killRadius && _canKillPlayer && _state == GrimState.Chasing)
         {
@@ -149,7 +153,7 @@ public class GrimReaper : BasicNavMeshAgent
                 _playerKillSFX.Play();
                 _playerCharacter.DestroyPlayer();
             }
-               
+
 
             if (!_isGameOver)
                 Invoke("EndGame", 0.5f);
