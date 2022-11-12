@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7747941317979891448}
   - component: {fileID: 3207566133011094057}
   m_Layer: 7
-  m_Name: VFX_Agent_Death
+  m_Name: VFX_Death_Teleport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -295,7 +295,7 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 2
-      minColor: {r: 0.5283019, g: 0, b: 0, a: 1}
+      minColor: {r: 0.084905684, g: 0.035644367, b: 0.035644367, a: 1}
       maxColor: {r: 0.028301895, g: 0.027233899, b: 0.026877899, a: 1}
       maxGradient:
         serializedVersion: 2

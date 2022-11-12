@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SceneManager : MonoBehaviour
 {
@@ -38,5 +39,10 @@ public class SceneManager : MonoBehaviour
     public void DeathScene()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(_deathScene);
+    }
+
+    public Scene GetActiveScene()
+    {
+        return UnityEngine.SceneManagement.SceneManager.GetActiveScene();
     }
 }

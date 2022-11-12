@@ -24,14 +24,14 @@ public class AwarenessManager : MonoBehaviour
     [SerializeField] private float _randomThoughtTimer = 10f;
 
     [Header("Audio")]
-    [SerializeField] private AudioSource _securityIncreaseSound = null;
+    [SerializeField] private AudioSource _securityIncreaseMildSFX = null;
+    [SerializeField] private AudioSource _securityIncreaseSevereSFX = null;
     [SerializeField] private AudioSource _theme = null;
     [SerializeField] private AudioSource _cityWhiteNoise = null;
     [SerializeField] [Range(0, 1f)] private float _maxThemeVolume = 1f;
     [SerializeField] [Range(0, 0.05f)] private float _themeStep = 0.005f;
 
     [Header("Player thoughts")]
-    [SerializeField] private ChatBillboard _chatBillboard;
     [SerializeField] private bool _playerThoughtsEnabled = true;
 
     // Compile time strings
@@ -57,11 +57,15 @@ public class AwarenessManager : MonoBehaviour
     // Random thoughts to display above player
     private List<string> _randomThoughts = new List<string>();
 
-    void Awake()
+    // Chat bubble above player
+    private ChatBillboard _chatBillboard;
+
+    void Start()
     {
         _player = GameObject.FindGameObjectWithTag(_playerTag);
         _grim = GameObject.FindGameObjectWithTag(_grimTag);
         _vignette = Camera.main.gameObject.GetComponent<PostProcessVolume>().profile.GetSetting<Vignette>();
+        
 
         // Play the white noise city sounds
         _cityWhiteNoise.Play();
@@ -71,6 +75,9 @@ public class AwarenessManager : MonoBehaviour
 
         if (!_player)
             throw new UnityException("Could not find player");
+
+        // Get board after getting player
+        _chatBillboard = _player.GetComponent<ChatBillboard>();
 
         if (_grim)
             _reaper = _grim.GetComponent<GrimReaper>();
@@ -111,9 +118,6 @@ public class AwarenessManager : MonoBehaviour
 
     private void OnSecurityIncrease()
     {
-        if (_securityIncreaseSound != null)
-            _securityIncreaseSound.Play();
-
         StartCoroutine("IncreaseVignette");
 
         if (_level == AwarenessLevel.Alerted)
@@ -124,7 +128,10 @@ public class AwarenessManager : MonoBehaviour
                 StartCoroutine("IncreaseAudio");
                 _isPlayingTheme = true;
             }
-                
+
+            if (_securityIncreaseMildSFX != null)
+                _securityIncreaseMildSFX.Play();
+
 
             foreach (AgentCharacter agent in _agents)
             {
@@ -142,6 +149,9 @@ public class AwarenessManager : MonoBehaviour
                 StartCoroutine("IncreaseAudio");
                 _isPlayingTheme = true;
             }
+
+            if (_securityIncreaseSevereSFX != null)
+                _securityIncreaseSevereSFX.Play();
 
             foreach (AgentCharacter agent in _agents)
             {
@@ -227,7 +237,6 @@ public class AwarenessManager : MonoBehaviour
 
                 // Set agent blind to crimeS
                 agent.HasSeenCrime = false;
-                Debug.Log("OMG SHE IS DEAD");
             }
         }
     }

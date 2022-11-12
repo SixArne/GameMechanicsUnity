@@ -635,21 +635,20 @@ MonoBehaviour:
   _arriveDistance: 2
   _targetMovement: {fileID: 0}
   _pursueMultiplier: 4
-  _wanderDistance: 20
-  _reachedDestination: 3.07
-  _DeathParticle: {fileID: 6285873051999190894, guid: cde65c0b351d23b4eb08a505f5efab7c, type: 3}
-  _visuals: {fileID: 6681978476229745797}
   _DeathMaterial: {fileID: 2100000, guid: 7c8d6170957e97b48887f79c68ae6d33, type: 2}
   _FollowMaterial: {fileID: 2100000, guid: 4515a74e9cdf2b746a0a659047f1ded3, type: 2}
   _NormalMaterial: {fileID: 2100000, guid: a8a7607c4e857044cb99b1aeaa155bc4, type: 2}
-  _blindEyeCooldown: 60
-  _state: 0
+  _DeathParticle: {fileID: 7747941317979891448, guid: ffaa13c91a3c1124a827cad79ab8a54f, type: 3}
+  _visuals: {fileID: 6681978476229745797}
+  _normalSpeed: 7
+  _fleeSpeed: 12
+  _wanderDistance: 20
+  _reachedDestination: 3.07
   _playerDetectRadius: 10
+  _state: 0
   _playerMask:
     serializedVersion: 2
     m_Bits: 64
-  _normalSpeed: 7
-  _fleeSpeed: 12
   _displayPlayerDetectRadius: 0
   _displayReachedDestination: 0
   _displayWanderDestination: 0
@@ -669,13 +668,6 @@ MonoBehaviour:
   _killImage: {fileID: 3216337742202647681}
   _followImage: {fileID: 4670986189722070866}
   _UIPannel: {fileID: 8442277448538984689}
-  _agentInteractRadius: 5
-  _crimeRayLength: 5
-  _playerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  _agentDeathMaterial: {fileID: 2100000, guid: 7c8d6170957e97b48887f79c68ae6d33, type: 2}
-  _displayAgentInteractRadius: 0
 --- !u!136 &1566566283
 CapsuleCollider:
   m_ObjectHideFlags: 0

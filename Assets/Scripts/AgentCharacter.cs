@@ -65,14 +65,6 @@ public class AgentCharacter : BasicNavMeshAgent
     protected override void Awake()
     {
         base.Awake();
-
-        _player = GameObject.FindObjectOfType<PlayerCharacter>();
-        _awarenessBehavior = GetComponent<AwarenessBehavior>();
-        _visionCone = GetComponent<VisionCone>();
-        _meshRenderer = _visuals.GetComponent<MeshRenderer>();
-
-
-        _agent.speed = _normalSpeed;
     }
 
     #region GetSet
@@ -151,6 +143,14 @@ public class AgentCharacter : BasicNavMeshAgent
 
     void Start()
     {
+        _player = GameObject.FindObjectOfType<PlayerCharacter>();
+        _awarenessBehavior = GetComponent<AwarenessBehavior>();
+        _visionCone = GetComponent<VisionCone>();
+        _meshRenderer = _visuals.GetComponent<MeshRenderer>();
+
+
+        _agent.speed = _normalSpeed;
+
         CalculateWanderDestination();
     }
 
@@ -204,7 +204,6 @@ public class AgentCharacter : BasicNavMeshAgent
 
             if (colliders.Length > 0 && CanRunAway)
             {
-                Debug.Log("RUN");
                 _state = AgentState.Flee;
                 _agent.speed = _fleeSpeed;
             }

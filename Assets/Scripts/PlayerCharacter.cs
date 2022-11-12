@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Build;
 using UnityEngine;
 
 public class PlayerCharacter : BasicCharacter
@@ -19,6 +21,10 @@ public class PlayerCharacter : BasicCharacter
     [Header("Audio")]
     [SerializeField] private AudioSource _stabSFX = null;
 
+    private bool _hasUsedAbility = false;
+    private SoulUpgradeData _abilityData = null;
+    private Gamemode _gamemode;
+
     private Material _playerMat;
     private MeshRenderer _meshRenderer;
     private bool _canKill = true;
@@ -33,6 +39,18 @@ public class PlayerCharacter : BasicCharacter
         get => _closestId;
     }
 
+    public SoulUpgradeData AbilityData
+    {
+        get => _abilityData;
+        set => _abilityData = value;
+    }
+
+    public bool HasUsedAbility
+    {
+        get => _hasUsedAbility;
+        set => _hasUsedAbility = value;
+    }
+
     protected override void Awake()
     {
         base.Awake();
@@ -44,6 +62,40 @@ public class PlayerCharacter : BasicCharacter
             throw new UnityException("No mesh renderer found");
 
         _playerMat = _meshRenderer.material;
+
+        
+    }
+
+    private void Start()
+    {
+        // Fetch gamemode and request bought abilityData
+        // This has to be here to make sure that the reaper exists. #LifeCycle struggles
+        FetchAbilityData();
+    }
+
+    private void FetchAbilityData()
+    {
+        _gamemode = GameObject.FindObjectOfType<Gamemode>();
+        _abilityData = _gamemode.AbilityData;
+
+        // Load data required for script. (can be null in intro level)
+        if (_abilityData != null)
+        {
+            _abilityData.abilityScript.OnAttachPlayer();
+        }
+    }
+
+    /// <summary>
+    /// This will be called by the ability to ask the player to discard any information.
+    /// 
+    /// Some abilities are not controlled by the player when they happen, hence this.
+    /// </summary>
+    public void DiscardAbilityData()
+    {
+        _abilityData = null;
+        _hasUsedAbility = true;
+
+        _gamemode.HasUsedUpgrade = true; // Inform the gamemode to get rid of abilityData.
     }
 
     void Update()

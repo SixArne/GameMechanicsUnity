@@ -19,9 +19,9 @@ public class TutorialManager : MonoBehaviour
 
     private const string _runMessage = "I should run...";
     private const string _tooManyPeopleMessage = "Better make sure nobody notices";
-    private const string _needToKillFirst = "Grim will be here soon... I need a distraction";
-    private const string _perfectMessage = "This will do as a distraction...";
-    private const string _followMessage = "Interesting... He only has eyes for fresh bodies...";
+    private const string _needToKillFirst = "Grim will be here soon... I need a sacrifice";
+    private const string _perfectMessage = "This will do as a sacrifice";
+    private const string _followMessage = "As long as he can reap he is happy...";
     private const string _almostDone = "I should go before he's done";
     private bool _hasRegisteredDeath = false;
     private bool _isInAgentRadius = false;
@@ -82,6 +82,9 @@ public class TutorialManager : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (!_agentCharacter)
+            return;
+
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(_progressWall.transform.position, _wallHelpMessageRadius);
         Gizmos.DrawWireSphere(_agentCharacter.transform.position, _agentKillMessageRadius);

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class GrimReaper : BasicNavMeshAgent
 {
@@ -26,7 +28,12 @@ public class GrimReaper : BasicNavMeshAgent
     [Header("Audio")]
     [SerializeField] private AudioSource _playerKillSFX = null;
 
+    [Header("References")]
+    [SerializeField] private ChatBillboard _chatBillBoard = null;
+    [SerializeField] private ParticleSystem _teleportParticle = null;
+
     const string _playerTag = "Friendly";
+    const string _levelEndMessage = "I EXPECT MORE TOMORROW";
 
     private float _currentTimer = 0f;
     private float _speedIncreaseCurrentTimer = 0f;
@@ -34,7 +41,9 @@ public class GrimReaper : BasicNavMeshAgent
 
     private bool _canKillPlayer = true;
     private bool _isGameOver = false;
+    private bool _hasPlayedLevelEndAnimation = false;
     private GameObject _deadAgent = null;
+    private Gamemode _gamemode = null;
 
     public GrimState State
     {
@@ -51,9 +60,14 @@ public class GrimReaper : BasicNavMeshAgent
     protected override void Awake()
     {
         base.Awake();
+    }
 
+    private void Start()
+    {
         _playerCharacter = GameObject.FindObjectOfType<PlayerCharacter>();
         _sceneManager = GameObject.FindObjectOfType<SceneManager>();
+        _gamemode = GameObject.FindObjectOfType<Gamemode>();
+        _chatBillBoard = GetComponent<ChatBillboard>();
     }
 
     private void OnSpeedIncrease()
@@ -66,8 +80,42 @@ public class GrimReaper : BasicNavMeshAgent
         }
     }
 
+    private void TeleportToPlayer()
+    {
+        Vector3 playerPos = _playerCharacter.transform.position;
+        float wanderDistance = 2f;
+
+        Vector2 randomDirection = Random.insideUnitCircle;
+        Vector3 randomWanderLocation = new Vector3(
+            playerPos.x + randomDirection.x * wanderDistance,
+            playerPos.y,
+            playerPos.z + randomDirection.y * wanderDistance
+          );
+
+        NavMeshHit navMeshHit;
+        if (NavMesh.SamplePosition(randomWanderLocation, out navMeshHit, 100f, NavMesh.AllAreas))
+        {
+            transform.position = navMeshHit.position;
+        }
+    }
+
     private void Update()
     {
+        if (!_hasPlayedLevelEndAnimation && _gamemode.LevelHasEnded)
+        {
+            TeleportToPlayer();
+            Instantiate(_teleportParticle, transform.position, transform.rotation);
+            _chatBillBoard.SetText(_levelEndMessage, 3f);
+            _hasPlayedLevelEndAnimation = true;
+            _agent.isStopped = true; // Prevent grim from walking
+        }
+
+        if (_gamemode.LevelHasEnded)
+        {
+            return; // Disable Grim reaper on level end.
+        }
+             
+
         // Increases Hein speed automatically;
         OnSpeedIncrease();
 
@@ -87,6 +135,13 @@ public class GrimReaper : BasicNavMeshAgent
         Vector3 transformPosition = _playerCharacter.transform.position - transform.position;
         if (transformPosition.sqrMagnitude <= _killRadius * _killRadius && _canKillPlayer && _state == GrimState.Chasing)
         {
+            if (!_playerCharacter.HasUsedAbility && _playerCharacter.AbilityData && _playerCharacter.AbilityData.abilityType == SoulUpgradeData.AbilityType.OnDead)
+            {
+                // Execute ability on the player.
+                _playerCharacter.AbilityData.abilityScript.OnExecute();
+                return;
+            }
+
             _canKillPlayer = false;
 
             if (_playerCharacter)
@@ -127,6 +182,8 @@ public class GrimReaper : BasicNavMeshAgent
 
                 // Make hein bit faster
                 _agent.speed += _heinSpeedIncrease;
+
+                _gamemode.OnAgentCollected();
 
                 Destroy(_deadAgent);
             }
