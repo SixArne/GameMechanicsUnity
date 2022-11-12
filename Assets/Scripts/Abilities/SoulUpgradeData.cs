@@ -8,6 +8,7 @@ public class SoulUpgradeData : ScriptableObject
     public enum AbilityType
     {
         OnDead,
+        OnAwareness,
     }
 
     public string upgradeName;

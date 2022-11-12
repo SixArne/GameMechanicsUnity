@@ -35,7 +35,7 @@ MonoBehaviour:
     value: 0
   color:
     overrideState: 1
-    value: {r: 0, g: 0, b: 0, a: 1}
+    value: {r: 0.14150941, g: 0.14150941, b: 0.14150941, a: 1}
   center:
     overrideState: 1
     value: {x: 0.5, y: 0.5}
@@ -52,9 +52,9 @@ MonoBehaviour:
     overrideState: 1
     value: 0
   mask:
-    overrideState: 0
-    value: {fileID: 0}
+    overrideState: 1
+    value: {fileID: 2800000, guid: 83a22ff5d6dac6a42bee117814bdd982, type: 3}
     defaultState: 1
   opacity:
     overrideState: 0
-    value: 1
+    value: 0.964

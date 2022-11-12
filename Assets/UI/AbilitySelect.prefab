@@ -566,7 +566,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _abilities:
-  - {fileID: 11400000, guid: 7371ff7275620e0498cee9fcd59eece0, type: 2}
+  - {fileID: 11400000, guid: 38bd5476159e87c438c60bfb1cf51c55, type: 2}
   - {fileID: 11400000, guid: 7371ff7275620e0498cee9fcd59eece0, type: 2}
   - {fileID: 11400000, guid: 7371ff7275620e0498cee9fcd59eece0, type: 2}
   _cards:
@@ -946,7 +946,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -975,7 +975,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 1.4047796, y: 0, z: -3.3200836, w: 0}
+  m_margin: {x: 1.4047796, y: 0, z: 40.01564, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

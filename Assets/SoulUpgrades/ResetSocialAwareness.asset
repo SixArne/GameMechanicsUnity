@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a058620ec2f3e0746a684ca2e80d90bf, type: 3}
+  m_Name: ResetSocialAwareness
+  m_EditorClassIdentifier: 
+  upgradeName: Amnesia
+  upgradeDescriptionn: 'This ability activates when the social awareness goes to
+    a severe level.
+
+    This will reset the awareness and make all citizens blind
+    to danger for 30 seconds.'
+  upgradeCost: 10
+  abilityType: 1
+  abilityScript: {fileID: 4074275719689073999, guid: 7605f82ce1c38fd4dafbc0fc263fb440, type: 3}

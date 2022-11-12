@@ -9,6 +9,7 @@ public class AgentCharacter : BasicNavMeshAgent
     [Header("Materials")]
     [SerializeField] private Material _DeathMaterial;
     [SerializeField] private Material _FollowMaterial;
+    [SerializeField] private Material _AvoidMaterial;
     [SerializeField] private Material _NormalMaterial;
     [SerializeField] private ParticleSystem _DeathParticle;
 
@@ -17,9 +18,10 @@ public class AgentCharacter : BasicNavMeshAgent
 
     [Header("Settings")]
     [SerializeField] float _normalSpeed = 0f;
+    [SerializeField] float _followSpeed = 3f;
     [SerializeField] float _fleeSpeed = 5f;
     [SerializeField] readonly private float _wanderMaxCooldown = 5f;
-    [SerializeField] readonly private float _blindEyeCooldown = 60f;
+    [SerializeField] private float _blindEyeCooldown = 60f;
     [SerializeField] private float _wanderDistance = 5f;
     [SerializeField] private float _reachedDestination = 5f;
     [SerializeField] float _playerDetectRadius = 10f;
@@ -48,6 +50,7 @@ public class AgentCharacter : BasicNavMeshAgent
     private bool _isTurningBlindEye = false;
     private bool _canInteract = false;
     private bool _canRunAway = false;
+    private float _originalBlindEyeCooldown = 0f;
 
     private AwarenessBehavior _awarenessBehavior = null;
     private VisionCone _visionCone = null;
@@ -65,6 +68,8 @@ public class AgentCharacter : BasicNavMeshAgent
     protected override void Awake()
     {
         base.Awake();
+
+        _originalBlindEyeCooldown = _blindEyeCooldown;
     }
 
     #region GetSet
@@ -136,10 +141,35 @@ public class AgentCharacter : BasicNavMeshAgent
         set
         {
             _canRunAway = value;
-            _awarenessBehavior.CanFollow = false;
+            _awarenessBehavior.CanFollow = !value;
+        }
+    }
+
+    public bool IsTurningBlindEye
+    {
+        get => _isTurningBlindEye;
+        set
+        {
+            _isTurningBlindEye = value;
+            _blindEyeTimer = 0f;
         }
     }
     #endregion
+
+    public void BlindAgent(float duration)
+    {
+        // This method is always called on the "Amnesia" ability usage
+        _isTurningBlindEye = true;
+        _hasSeenCrime = false;
+        _blindEyeCooldown = duration;
+    }
+
+    public void UnblindAgent()
+    {
+        // This methid is always called at the end of the "Amnesia" ability usage
+        _isTurningBlindEye = false;
+        _blindEyeCooldown = _originalBlindEyeCooldown;
+    }
 
     void Start()
     {
@@ -173,23 +203,24 @@ public class AgentCharacter : BasicNavMeshAgent
         {
             Target = _player.transform.position;
             _meshRenderer.material = _FollowMaterial;
+            _agent.speed = _followSpeed;
 
             Seek();
-
-
-
-            return;
         }
         else if (_state == AgentState.Wander)
         {
             // overwrite old mats
             _meshRenderer.material = _NormalMaterial;
+            _agent.speed = _normalSpeed;
+
             Wander();
         }
         else if (_state == AgentState.Flee)
         {
             // overwrite old mats
-            _meshRenderer.material = _NormalMaterial;
+            _meshRenderer.material = _AvoidMaterial;
+            _agent.speed = _fleeSpeed;
+        
             Flee();
         }
 

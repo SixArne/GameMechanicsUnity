@@ -14283,6 +14283,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5091563684729779716, guid: be481c9c0b654104997cb9855299938c, type: 3}
+      propertyPath: _level
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5091563684729779716, guid: be481c9c0b654104997cb9855299938c, type: 3}
       propertyPath: _amountOnSeen
       value: 5
       objectReference: {fileID: 0}

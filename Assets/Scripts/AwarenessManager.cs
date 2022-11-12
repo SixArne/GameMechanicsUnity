@@ -11,7 +11,6 @@ public class AwarenessManager : MonoBehaviour
         Normal = 0,
         Alerted,
         HighAlert,
-        Elimination
     }
 
     [Header("References")]
@@ -26,6 +25,7 @@ public class AwarenessManager : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource _securityIncreaseMildSFX = null;
     [SerializeField] private AudioSource _securityIncreaseSevereSFX = null;
+    [SerializeField] private AudioSource _amnesiaSFX = null;
     [SerializeField] private AudioSource _theme = null;
     [SerializeField] private AudioSource _cityWhiteNoise = null;
     [SerializeField] [Range(0, 1f)] private float _maxThemeVolume = 1f;
@@ -59,6 +59,7 @@ public class AwarenessManager : MonoBehaviour
 
     // Chat bubble above player
     private ChatBillboard _chatBillboard;
+    private PlayerCharacter _playerCharacter;
 
     void Start()
     {
@@ -78,6 +79,7 @@ public class AwarenessManager : MonoBehaviour
 
         // Get board after getting player
         _chatBillboard = _player.GetComponent<ChatBillboard>();
+        _playerCharacter = _player.GetComponent<PlayerCharacter>();
 
         if (_grim)
             _reaper = _grim.GetComponent<GrimReaper>();
@@ -118,10 +120,11 @@ public class AwarenessManager : MonoBehaviour
 
     private void OnSecurityIncrease()
     {
-        StartCoroutine("IncreaseVignette");
-
         if (_level == AwarenessLevel.Alerted)
         {
+            // Starts to transition vignette towards a given level
+            StartCoroutine("IncreaseVignette", 0.4f);
+
             if (!_isPlayingTheme && _theme != null)
             {
                 _theme.Play();
@@ -143,25 +146,35 @@ public class AwarenessManager : MonoBehaviour
         }
         else if (_level == AwarenessLevel.HighAlert)
         {
-            if (!_isPlayingTheme && _theme != null)
-            {
-                _theme.Play();
-                StartCoroutine("IncreaseAudio");
-                _isPlayingTheme = true;
-            }
-
-            if (_securityIncreaseSevereSFX != null)
-                _securityIncreaseSevereSFX.Play();
-
+            // Tell all agents to run on sight of player
             foreach (AgentCharacter agent in _agents)
             {
                 agent.CanRunAway = true;
             }
-        }
-        //TODO: add highest alert
-        
 
-        // Spawn special units after while
+            // Starts to transition vignette towards a given level
+            StartCoroutine("IncreaseVignette", 0.8f);
+
+            // Only execute if the player has not used and ability, has an ability and is using the right type
+            if (!_playerCharacter.HasUsedAbility && _playerCharacter.AbilityData && _playerCharacter.AbilityData.abilityType == SoulUpgradeData.AbilityType.OnAwareness)
+            {
+                // Execute the player abilty scripts
+                _playerCharacter.AbilityData.abilityScript.OnExecute();
+                _amnesiaSFX.Play(); // Dirty fix but it works
+            }
+            else if (_securityIncreaseSevereSFX != null)
+            {
+                _securityIncreaseSevereSFX.Play();
+            }
+
+            if (!_isPlayingTheme && _theme != null)
+            {
+                _theme.Play();
+                StartCoroutine("IncreaseAudio");
+
+                _isPlayingTheme = true;
+            }
+        }
     }
 
     IEnumerator IncreaseAudio()
@@ -177,11 +190,11 @@ public class AwarenessManager : MonoBehaviour
         }
     }
 
-    IEnumerator IncreaseVignette()
+    IEnumerator IncreaseVignette(float level)
     {
         float vignetteLevel = 0f;
 
-        while (vignetteLevel <= 0.17f)
+        while (vignetteLevel <= level)
         {
             _vignette.intensity.value += Time.deltaTime;
             vignetteLevel += Time.deltaTime;
@@ -196,7 +209,7 @@ public class AwarenessManager : MonoBehaviour
         if ((int)_publicAwareness / 10 >= 1)
         {
             int oldLevel = (int)_level;
-            int newLevel = Mathf.Clamp(oldLevel + 1, 0, 3);
+            int newLevel = Mathf.Clamp(oldLevel + 1, 0, 2);
             _level = (AwarenessLevel)newLevel;
             
             if ((AwarenessLevel)oldLevel != _level)
@@ -240,4 +253,37 @@ public class AwarenessManager : MonoBehaviour
             }
         }
     }
+
+    #region Amensia ability
+    public void MakeAllAgentsBlind(float duration)
+    {
+        foreach (AgentCharacter agent in _agents)
+        {
+            agent.BlindAgent(duration);
+            agent.CanRunAway = false;
+        }
+
+        // This will automatically unblind them
+        StartCoroutine("UnBlindAllAgents", duration);
+        StopCoroutine("IncreaseVignette");
+    }
+
+    public void ResetPublicAwareness()
+    {
+        _vignette.intensity.value = 0f;
+        _publicAwareness = 0f;
+        _level = AwarenessLevel.Normal;
+        _theme.Stop(); // Stopm creepy music
+    }
+
+    public IEnumerator UnBlindAllAgents(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+
+        foreach (var agent in _agents)
+        {
+            agent.UnblindAgent();
+        }
+    }
+    #endregion
 }

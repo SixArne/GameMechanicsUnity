@@ -27,6 +27,7 @@ public class PlayerCharacter : BasicCharacter
 
     private Material _playerMat;
     private MeshRenderer _meshRenderer;
+    private AgentCharacter _follower = null;
     private bool _canKill = true;
     private float _currentKillCooldown = 0f;
     private Plane _cursorMovementPlane;
@@ -194,16 +195,28 @@ public class PlayerCharacter : BasicCharacter
 
             if (hasPressedFollow && !agentCharacter.CanRunAway)
             {
-                if (agentCharacter.State == AgentCharacter.AgentState.Follow)
+                // if pressing different agent then the one following
+                if (_follower != null && _follower.GetInstanceID() != agentCharacter.GetInstanceID())
                 {
-                    agentCharacter.State = AgentCharacter.AgentState.Wander;
+                    _follower.State = AgentCharacter.AgentState.Wander;
+                    _follower.IsFollowing = false;
+
+                    agentCharacter.State = AgentCharacter.AgentState.Follow;
+                    agentCharacter.IsFollowing = true;
+                    _follower = agentCharacter;
                 }
-                else
+                else if (_follower == null)
                 {
                     agentCharacter.State = AgentCharacter.AgentState.Follow;
+                    agentCharacter.IsFollowing = true;
+                    _follower = agentCharacter;
                 }
-
-                agentCharacter.IsFollowing = !agentCharacter.IsFollowing;
+                else if (_follower != null && _follower == agentCharacter)
+                {
+                    agentCharacter.State = AgentCharacter.AgentState.Wander;
+                    agentCharacter.IsFollowing = !agentCharacter.IsFollowing;
+                    _follower = null;
+                }
             }
         }
         else
