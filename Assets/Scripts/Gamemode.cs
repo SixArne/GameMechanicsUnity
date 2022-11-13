@@ -81,7 +81,8 @@ public class Gamemode : MonoBehaviour
 
     public void OnAgentCollected()
     {
-        // update quota
+        // Called when the reaper collects a soul
+
         --_leftToKill;
         _totalKills++;
         _soulsToSpend++;
@@ -93,14 +94,12 @@ public class Gamemode : MonoBehaviour
             IncreaseDifficulty();
 
             // Start callback that will select scene
-            StartCoroutine("OnLevelCompleted");
+            Invoke("OnLevelCompleted", _endLevelDelaySeconds);
         }
     }
 
-    private IEnumerator OnLevelCompleted()
+    private void OnLevelCompleted()
     {
-        yield return new WaitForSeconds(_endLevelDelaySeconds);
-
         SceneManager.LoadScene(_levelname);
         _levelHasEnded = false;
     }

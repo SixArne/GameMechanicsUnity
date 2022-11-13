@@ -9,6 +9,7 @@ public abstract class BasicAbility : MonoBehaviour
 
     public virtual void OnAttachPlayer() 
     {
+        // Values that are used often are found and cached in the base class.
         _playerCharacter = GameObject.FindObjectOfType<PlayerCharacter>();
         _grimReaper = GameObject.FindObjectOfType<GrimReaper>();
     }

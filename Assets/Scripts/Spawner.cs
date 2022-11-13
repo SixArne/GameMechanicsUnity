@@ -17,11 +17,14 @@ public class Spawner : MonoBehaviour
 
     void Awake()
     {
+        // We need to make sure that whatever we spawn has a navmeshcomponent
         NavMeshAgent navMeshComp = _prefab.GetComponent<NavMeshAgent>();
 
         if (navMeshComp == null)
+        {
             throw new UnityException("NO NAVMESH COMPONENT FOUND");
-
+        }
+            
         SpawnEntities();
     }
 
@@ -38,6 +41,7 @@ public class Spawner : MonoBehaviour
                 transform.position.z + (randomLocation.y * randomDistance)
                 );
 
+            // Map the spawnPosition to be on the navmesh
             NavMeshHit hit;
             if (NavMesh.SamplePosition(spawnPosition, out hit, 100f, NavMesh.AllAreas)){
                 _spawnedAgents.Add(Instantiate(_prefab, hit.position, Quaternion.identity));

@@ -6,17 +6,17 @@ public class AmnesiaAbility : BasicAbility
 {
     [SerializeField] float _blindDuration;
 
+    // Needed to blind agents and reset awareness
     AwarenessManager _awarenessManager;
-    AudioSource _audioSource;
 
     public override void OnAttachPlayer()
     {
         base.OnAttachPlayer();
 
+        // This only gets fetched at the beginning of each level once.
         _awarenessManager = GameObject.FindObjectOfType<AwarenessManager>();
     }
 
-    // Ability specific execution
     public override void OnExecute()
     {
         _awarenessManager.MakeAllAgentsBlind(_blindDuration);

@@ -35,6 +35,7 @@ public class VisionCone : MonoBehaviour
 
     public void Start()
     {
+        // We don't want to find targets every frame.
         StartCoroutine("FindTargetsWithDelay", .2f);
     }
 
@@ -59,6 +60,7 @@ public class VisionCone : MonoBehaviour
 
     public void FindVisibleTargets()
     {
+        // We clear targets on each check and first find all agents close to us
         _visibleTargets.Clear();
         Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, ViewRadius, _targetMask);
 
@@ -67,11 +69,12 @@ public class VisionCone : MonoBehaviour
             Transform target = t.transform;
             Vector3 dirToTarget = (target.position - transform.position).normalized;
 
-            // within range
+            // Now we check if they are within range
             if (Vector3.Angle(transform.forward, dirToTarget) <= ViewAngle / 2)
             {
                 float dstToTarget = Vector3.Distance(transform.position, target.position);
 
+                // Here we check if anything is blocking between our view and the target, if not we add it as a visible target
                 if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, _obstacleMask) && target.CompareTag(_deathTag))
                 {
                     _visibleTargets.Add(target);

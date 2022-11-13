@@ -19,6 +19,7 @@ public class PlayerAndReaperSpawner : MonoBehaviour
 
     private void SpawnPlayer()
     {
+        // Get a random spawnpoint for the player
         int playerSpawnIndex = Random.Range(0, _playerSpawnPoints.Count);
         Vector3 playerSpawnLocation = _playerSpawnPoints[playerSpawnIndex].position;
 
@@ -28,9 +29,11 @@ public class PlayerAndReaperSpawner : MonoBehaviour
 
     private void SpawnReaper()
     {
+        // Get a random spawnpoint for the reaper
         int reaperSpawnIndex = Random.Range(0, _reaperSpawnPoints.Count);
         Vector3 reaperSpawnLocation = _reaperSpawnPoints[reaperSpawnIndex].position;
 
+        // Make sure he is on the navmesh
         NavMeshHit navMeshHit;
         if (NavMesh.SamplePosition(reaperSpawnLocation, out navMeshHit, 100f, NavMesh.AllAreas))
         {

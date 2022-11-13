@@ -386,11 +386,15 @@ PrefabInstance:
       objectReference: {fileID: 2180426786197422948}
     - target: {fileID: 1324818216, guid: 6ae65ea3e64c6fb4c9f45b3426dc1282, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: StoryScene
+      value: Play
       objectReference: {fileID: 0}
     - target: {fileID: 1324818216, guid: 6ae65ea3e64c6fb4c9f45b3426dc1282, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: CustomSceneManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1324818217, guid: 6ae65ea3e64c6fb4c9f45b3426dc1282, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1638412514054822763, guid: 6ae65ea3e64c6fb4c9f45b3426dc1282, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -407,6 +411,10 @@ PrefabInstance:
     - target: {fileID: 1638412514054822765, guid: 6ae65ea3e64c6fb4c9f45b3426dc1282, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1638412514423432152, guid: 6ae65ea3e64c6fb4c9f45b3426dc1282, type: 3}
+      propertyPath: m_text
+      value: Play
       objectReference: {fileID: 0}
     - target: {fileID: 1638412514671098913, guid: 6ae65ea3e64c6fb4c9f45b3426dc1282, type: 3}
       propertyPath: m_Pivot.x

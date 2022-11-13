@@ -7,6 +7,7 @@ public class PlayerCharacter : BasicCharacter
     const string HORIZONTAL_MOVEMENT = "horizontalMovement";
     const string VERTICAL_MOVEMENT = "verticalMovement";
     const string GROUND_LAYER = "Ground";
+    const string _agentTag = "Agent";
 
     [SerializeField] private LayerMask _interactionMask;
     [SerializeField] private float _interactRadius = 5.0f;
@@ -22,16 +23,11 @@ public class PlayerCharacter : BasicCharacter
     private bool _hasUsedAbility = false;
     private SoulUpgradeData _abilityData = null;
     private Gamemode _gamemode;
-
-    private Material _playerMat;
     private MeshRenderer _meshRenderer;
     private AgentCharacter _follower = null;
     private bool _canKill = true;
-    private float _currentKillCooldown = 0f;
     private Plane _cursorMovementPlane;
-
-    private const string _agentTag = "Agent";
-    private int _closestId = -1;
+    private int _closestId = -1; // set to a impossible value
 
     public int ClosestId
     {
@@ -53,16 +49,15 @@ public class PlayerCharacter : BasicCharacter
     protected override void Awake()
     {
         base.Awake();
+
+        // plane used to raycast on, this prevents the player from turning when the mouse is outside the playable area.
         _cursorMovementPlane = new Plane(Vector3.up, transform.position);
 
+        // reference to set materials later
         _meshRenderer = _Visuals.GetComponent<MeshRenderer>();
 
         if (!_meshRenderer)
             throw new UnityException("No mesh renderer found");
-
-        _playerMat = _meshRenderer.material;
-
-        
     }
 
     private void Start()
@@ -99,26 +94,18 @@ public class PlayerCharacter : BasicCharacter
 
     void Update()
     {
-        HandleCoolDowns();
-
+        // Handle movement related input and actions
         HandleMovement();
 
+        // Handle interactions with agents
         HandleInteraction();
     }
 
-    void HandleCoolDowns()
+    void EnableDaggers()
     {
-        if (!_canKill)
-            _currentKillCooldown += Time.deltaTime;
-
-        if (_currentKillCooldown >= _killCooldown)
-        {
-            _currentKillCooldown = 0f;
-            _canKill = true;
-
-            //_meshRenderer.material = _playerMat;
-            _daggers.SetActive(true);
-        }
+        // This is a cooldown invoked method
+        _canKill = true;
+        _daggers.SetActive(true);
     }
 
     void HandleMovement()
@@ -129,30 +116,32 @@ public class PlayerCharacter : BasicCharacter
         float horizontalMovement = Input.GetAxisRaw(HORIZONTAL_MOVEMENT);
         float verticalMovement = Input.GetAxisRaw(VERTICAL_MOVEMENT);
 
+        // Our movementbehavior will handle the actual movement
         Vector3 movement = horizontalMovement * Vector3.right + verticalMovement * Vector3.forward;
-
         _movementBehavior.DesiredMovementDirection = movement;
-    
+
+        Vector3 newPosition = transform.position;
+
+        // We will check if our mouse camera ray hits the floor of the map, if not we take the hidden plane.
         Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        Vector3 positionOfMouseInWorld = transform.position;
-
         RaycastHit hitInfo;
         if (Physics.Raycast(mouseRay, out hitInfo, 10000.0f, LayerMask.GetMask(GROUND_LAYER)))
         {
-            positionOfMouseInWorld = hitInfo.point;
+            newPosition = hitInfo.point;
         }
         else
         {
             _cursorMovementPlane.Raycast(mouseRay, out float distance);
-            positionOfMouseInWorld = mouseRay.GetPoint(distance);
+            newPosition = mouseRay.GetPoint(distance);
         }
 
-        _movementBehavior.DesiredLookAtPoint = positionOfMouseInWorld;
+        // Set the lookat point
+        _movementBehavior.DesiredLookAtPoint = newPosition;
     }
 
     void HandleInteraction()
     {
+        // We only want keyup events, hence the hardcoded values
         bool hasPressedFollow = Input.GetKeyUp(KeyCode.Q);
         bool hasPressedKill = Input.GetKeyUp(KeyCode.E);
 
@@ -166,14 +155,18 @@ public class PlayerCharacter : BasicCharacter
             if (collider.gameObject.tag != _agentTag)
                 return;
 
+            // Get the agent component
             AgentCharacter agentCharacter = collider.gameObject.GetComponentInParent<AgentCharacter>();
 
+            // early exit
             if (!agentCharacter)
                 return;
 
+            // Some agents will refuse to interact, hence the check
             if (!agentCharacter.IsInteractable)
                 return;
 
+            // We tell the actual agent that the player can interact with him
             agentCharacter.CanInteract = true;
             _closestId = agentCharacter.GetInstanceID();
 
@@ -189,12 +182,15 @@ public class PlayerCharacter : BasicCharacter
                     // Execute ability on the player.
                     _abilityData.abilityScript.OnExecute();
 
-                    StartCoroutine("EndGame", 10f);
+                    Invoke("EndGame", 5f);
                 }
 
                 agentCharacter.State = AgentCharacter.AgentState.Dead;
                 agentCharacter.IsMarkedForKilling = true;
+
+                // Start kill cooldown
                 _canKill = false;
+                Invoke("EnableDaggers", _killCooldown);
 
                 _stabSFX.Play();
 
@@ -214,13 +210,13 @@ public class PlayerCharacter : BasicCharacter
                     agentCharacter.IsFollowing = true;
                     _follower = agentCharacter;
                 }
-                else if (_follower == null)
+                else if (_follower == null) // if pressing first agent
                 {
                     agentCharacter.State = AgentCharacter.AgentState.Follow;
                     agentCharacter.IsFollowing = true;
                     _follower = agentCharacter;
                 }
-                else if (_follower != null && _follower == agentCharacter)
+                else if (_follower != null && _follower == agentCharacter) // if releasing following agent
                 {
                     agentCharacter.State = AgentCharacter.AgentState.Wander;
                     agentCharacter.IsFollowing = !agentCharacter.IsFollowing;
@@ -234,9 +230,9 @@ public class PlayerCharacter : BasicCharacter
         }
     }
 
-    private IEnumerator EndGame(float time)
+    private void EndGame()
     {
-        yield return new WaitForSeconds(time);
+        // After killing grim go to menu scene
         GameObject.FindObjectOfType<CustomSceneManager>().MenuScene();
     }
 
@@ -258,6 +254,7 @@ public class PlayerCharacter : BasicCharacter
         {
             float distanceSqr = (collider.transform.position - transform.position).sqrMagnitude;
 
+            // Needs to be closer and needs to be an agent
             if (distanceSqr < closestDistanceSqr && collider.CompareTag(_agentTag))
             {
                 closest = collider;
@@ -265,9 +262,10 @@ public class PlayerCharacter : BasicCharacter
             }
         }
 
+        // We only want agents to be registered, so if the closest is not an agent we exit
         if (!closest.CompareTag(_agentTag))
             return null;
-        else
-            return closest;
+
+        return closest;
     }
 }

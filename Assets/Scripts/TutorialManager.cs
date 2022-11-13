@@ -30,6 +30,7 @@ public class TutorialManager : MonoBehaviour
             throw new UnityException("Player is gone??");
         }
 
+        // Show help message if close to collider
         float distanceToWallSquared = (_progressWall.transform.position - _playerCharacter.transform.position).sqrMagnitude;
         float wallRadiusSquared = _wallHelpMessageRadius * _wallHelpMessageRadius;
         if (_progressWall.enabled && distanceToWallSquared <= wallRadiusSquared)
@@ -39,12 +40,14 @@ public class TutorialManager : MonoBehaviour
 
         if (_agentCharacter)
         {
+            // Display help messages if close to agent
             float distanceToAgentSquared = (_agentCharacter.transform.position - _playerCharacter.transform.position).sqrMagnitude;
             float agentKillRadiusSquared = _agentKillMessageRadius * _agentKillMessageRadius;
             if (distanceToAgentSquared <= agentKillRadiusSquared &&
                 _agentCharacter.State != AgentCharacter.AgentState.Dead &&
                 !_isInAgentRadius)
             {
+                // bool used to ensure only 1 time use while close to agent.
                 _isInAgentRadius = true;
                 _chatbox.SetText(_perfectMessage);
                 StartCoroutine("DisplayHelpMessage", new object[3] { _tooManyPeopleMessage, 3f, 1.0f });
@@ -57,6 +60,7 @@ public class TutorialManager : MonoBehaviour
 
         if (_agentCharacter.State == AgentCharacter.AgentState.Dead && !_hasRegisteredDeath)
         {
+            // Spawn reaper on first kill
             GameObject reaper = Instantiate(_spawnPrefab, _spawnLocation.transform.position, Quaternion.identity);
             GrimReaper reaperLogic = reaper.GetComponent<GrimReaper>();
             reaperLogic.DeadAgent = _agentCharacter.gameObject;

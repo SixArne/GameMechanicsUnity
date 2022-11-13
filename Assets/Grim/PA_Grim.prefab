@@ -429,7 +429,7 @@ MonoBehaviour:
   _collectRadius: 3
   _killRadius: 2.79
   _heinSpeedIncrease: 0.5
-  _speedIncreaseEveryXSeconds: 10
+  _speedIncreaseEveryXSeconds: 12
   _sceneManager: {fileID: 2180426786844993895, guid: ec83fe5528644004cbec4f972817ac69, type: 3}
   _playerKillSFX: {fileID: -6493686611952877999}
   _chatBillBoard: {fileID: 6166861995315370136}

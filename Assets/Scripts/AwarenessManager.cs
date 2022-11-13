@@ -16,8 +16,9 @@ public class AwarenessManager : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private AwarenessLevel _level = AwarenessLevel.Normal;
     [SerializeField] private int _awarenessAmountOnSeen = 5;
-    [SerializeField] private float _randomThoughtTimer = 10f;
+    [SerializeField] private float _randomThoughtInterval = 10f;
     [SerializeField] private bool _canIgnoreGrim = false;
+    [SerializeField][Range(0, 0.05f)] private float _vignetteStep = 0.005f;
 
     [Header("Audio")]
     [SerializeField] private AudioSource _securityIncreaseMildSFX = null;
@@ -48,9 +49,6 @@ public class AwarenessManager : MonoBehaviour
     private bool _isPlayingTheme = false;
     private float _publicAwareness = 0f;
 
-    // Counter for random thoughts
-    private float _currentRandomThoughtTimer = 0f;
-
     // Random thoughts to display above player
     private List<string> _randomThoughts = new List<string>();
 
@@ -60,6 +58,7 @@ public class AwarenessManager : MonoBehaviour
 
     void Start()
     {
+        // Gather required components and check if they exist
         _playerCharacter = GameObject.FindObjectOfType<PlayerCharacter>();
         if (!_playerCharacter)
             throw new UnityException("Could not find player character");
@@ -83,16 +82,24 @@ public class AwarenessManager : MonoBehaviour
         _agents = GameObject.FindObjectsOfType<AgentCharacter>().ToList<AgentCharacter>();
 
         PopulateRandomThoughts();
+
+        // Random thought every x seconds
+        InvokeRepeating("RandomThought", _randomThoughtInterval, _randomThoughtInterval);
     }
 
     void PopulateRandomThoughts()
     {
-        _randomThoughts.Add("I better act carefull... don't want Grim and the police chasing me");
+        // These could be jokes or in game hints
+        _randomThoughts.Add("If someone sees a body they will be more wary");
         _randomThoughts.Add("Will I be able to eat tonight?");
         _randomThoughts.Add("Does Grim have a family?");
         _randomThoughts.Add("Maybe I can make some people follow me in an alley");
+        _randomThoughts.Add("I need to make sure grim is always far away");
+        _randomThoughts.Add("What if someone sees my sacrifices?");
+        _randomThoughts.Add("Maybe I can trade souls for cool powers");
     }
 
+    // Getters and setters
     public AwarenessLevel Level
     {
         get => _level;
@@ -108,35 +115,35 @@ public class AwarenessManager : MonoBehaviour
         _publicAwareness += _awarenessAmountOnSeen;
     }
 
-    private void DecreaseAwareness(int amount)
-    {
-        _publicAwareness -= amount;
-    }
-
     private void OnSecurityIncrease()
     {
+        if (!_isPlayingTheme && _theme != null)
+        {
+            _theme.Play();
+            StartCoroutine("IncreaseAudio");
+            _isPlayingTheme = true;
+        }
+
         if (_level == AwarenessLevel.Alerted)
         {
             // Starts to transition vignette towards a given level
             StartCoroutine("IncreaseVignette", 0.4f);
 
-            if (!_isPlayingTheme && _theme != null)
-            {
-                _theme.Play();
-                StartCoroutine("IncreaseAudio");
-                _isPlayingTheme = true;
-            }
-
+            // Play mild level sfx
             if (_securityIncreaseMildSFX != null)
+            {
                 _securityIncreaseMildSFX.Play();
-
-
+            }
+                
+            // We only want some agents to run from the player on a mild level
             foreach (AgentCharacter agent in _agents)
             {
-                int val = Random.Range(0, 4);
+                int val = Random.Range(0, 2);
 
                 if (val % 2 == 0)
+                {
                     agent.CanRunAway = true;
+                }
             }
         }
         else if (_level == AwarenessLevel.HighAlert)
@@ -161,93 +168,86 @@ public class AwarenessManager : MonoBehaviour
             {
                 _securityIncreaseSevereSFX.Play();
             }
-
-            if (!_isPlayingTheme && _theme != null)
-            {
-                _theme.Play();
-                StartCoroutine("IncreaseAudio");
-
-                _isPlayingTheme = true;
-            }
         }
     }
 
     IEnumerator IncreaseAudio()
     {
-        float audioLevel = 0f;
-
-        while (audioLevel < _maxThemeVolume)
+        // Coroutine will gradually increase volume level
+        while (_theme.volume < _maxThemeVolume)
         {
-           
-            audioLevel += _themeStep;
-            _theme.volume = audioLevel;
-            yield return new WaitForSeconds(0.05f);
+            _theme.volume += _themeStep;
+            yield return null;
         }
     }
 
     IEnumerator IncreaseVignette(float level)
     {
-        float vignetteLevel = 0f;
-
-        while (vignetteLevel <= level)
+        // Coroutine will gradually increase vignette intensity
+        while (_vignette.intensity.value <= level)
         {
-            _vignette.intensity.value += Time.deltaTime;
-            vignetteLevel += Time.deltaTime;
-
-            yield return new WaitForSeconds(0.05f);
+            _vignette.intensity.value += _vignetteStep;
+            yield return null;
         }
     }
 
     private void MonitorPublicAwareness()
     {
         // Every 10 stages the awareness will increase.
-        if ((int)_publicAwareness / 10 >= 1)
+        if (_publicAwareness >= 10f)
         {
             int oldLevel = (int)_level;
             int newLevel = Mathf.Clamp(oldLevel + 1, 0, 2);
             _level = (AwarenessLevel)newLevel;
             
             if ((AwarenessLevel)oldLevel != _level)
+            {
                 OnSecurityIncrease();
-
+            }
+                
             _publicAwareness = 0f;
         }
     }
 
     private void RandomThought()
     {
-        if (!_chatBillboard)
+        if (!_chatBillboard  || !_playerThoughtsEnabled)
             return; // exit early if chatboard is gone
 
+        // Pick a random thought and display it.
         int random = Random.Range(0, _randomThoughts.Count);
-        _chatBillboard.SetText(_randomThoughts[random], 3f);
+        _chatBillboard.SetText(_randomThoughts[random], 5f);
     }
 
     private void Update()
     {
+        // Check if something has happen and if so increase security level
         MonitorPublicAwareness();
-
-        _currentRandomThoughtTimer += Time.deltaTime;
-        if (_currentRandomThoughtTimer >= _randomThoughtTimer && _playerThoughtsEnabled)
-        {
-            RandomThought();
-            _currentRandomThoughtTimer = 0f;
-        }
 
         foreach (AgentCharacter agent in _agents)
         {
+            if (!agent) // agent was disposed off
+                continue;
+
+            // If body wwas discovered inform grim
             if (agent.State == AgentCharacter.AgentState.Dead && !agent.IsReaped && _reaper)
             {
                 _reaper.State = GrimReaper.GrimState.Collecting;
                 _reaper.DeadAgent = agent.gameObject;
             }
 
+            // If agent has seen crime, increase awareness
             if (agent.HasSeenCrime && agent.State != AgentCharacter.AgentState.Dead)
             {
                 IncreaseAwareness();
 
-                // Set agent blind to crimeS
+                // Set agent blind to crimes
                 agent.HasSeenCrime = false;
+            }
+
+            if ( agent.State == AgentCharacter.AgentState.Dead && agent.IsReaped)
+            {
+                Destroy(agent.gameObject);
             }
         }
     }
@@ -257,8 +257,12 @@ public class AwarenessManager : MonoBehaviour
     {
         foreach (AgentCharacter agent in _agents)
         {
-            agent.BlindAgent(duration);
-            agent.CanRunAway = false;
+            if (agent.State != AgentCharacter.AgentState.Dead)
+            {
+                agent.BlindAgent(duration);
+                agent.CanRunAway = false;
+                agent.State = AgentCharacter.AgentState.Wander;
+            }
         }
 
         // This will automatically unblind them
@@ -271,7 +275,7 @@ public class AwarenessManager : MonoBehaviour
         _vignette.intensity.value = 0f;
         _publicAwareness = 0f;
         _level = AwarenessLevel.Normal;
-        _theme.Stop(); // Stopm creepy music
+        _theme.Stop(); // Stop creepy music
     }
 
     public IEnumerator UnBlindAllAgents(float seconds)

@@ -24,14 +24,15 @@ public class OutplayedAbility : BasicAbility
 
         if (agents.Count == 0)
         {
-            // In case there are no agents... well player is screwed ?( ??????????? )? theehe
+            // In case there are no agents... well player is screwed
             return;
         }
 
+        // Pick a random player and teleport to it
         int randomAgent = Random.Range(0, agents.Count);
         AgentCharacter agent = agents[randomAgent];
-
         _playerCharacter.transform.position = agent.transform.position;
+
         _playerCharacter.DiscardAbilityData(); // Cleanup ability info.
 
         Instantiate(_teleportParticle, _playerCharacter.transform.position, Quaternion.identity);

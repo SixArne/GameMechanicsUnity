@@ -16,12 +16,14 @@ public class CameraBehavior : MonoBehaviour
     {
         _player = GameObject.FindObjectOfType<PlayerCharacter>().gameObject;
 
+        // Set the initial lookat position
         transform.position = _player.transform.position + _offset;
         transform.LookAt(_player.transform.position);    
     }
 
     void Update()
     {
+        // Follow player with offset and lerp to smoothen camera
         if (_player != null)
         {
             transform.position = Vector3.Lerp(transform.position, _player.transform.position + _offset, _followSpeed * Time.deltaTime);

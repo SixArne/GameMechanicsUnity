@@ -13,10 +13,8 @@ MonoBehaviour:
   m_Name: TeleportOnDeathUpgrade
   m_EditorClassIdentifier: 
   upgradeName: Outplayed
-  upgradeDescriptionn: 'When the grim reaper kills you your soul gets swapped with
-    a random NPC. This action happens automatically
-
-
-'
+  upgradeDescription: This passive ability will swap the player with a random citizen
+    when the reaper is about to kill the player (1 use only)
   upgradeCost: 5
+  abilityType: 0
   abilityScript: {fileID: 2798582851423916661, guid: 4788aed3dfc75494d8f682a1dbd24961, type: 3}

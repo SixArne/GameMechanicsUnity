@@ -6,6 +6,16 @@ using UnityEngine.AI;
 [RequireComponent(typeof(VisionCone))]
 public class AgentCharacter : BasicNavMeshAgent
 {
+    // States of agent
+    public enum AgentState
+    {
+        Wander,
+        Idle,
+        Follow,
+        Dead,
+        Flee
+    }
+
     [Header("Materials")]
     [SerializeField] private Material _DeathMaterial;
     [SerializeField] private Material _FollowMaterial;
@@ -44,7 +54,6 @@ public class AgentCharacter : BasicNavMeshAgent
 
     private bool _isFollowing = false;
     private bool _isMarkedForKilling = false;
-    private bool _isDead = false;
     private bool _hasSeenCrime = false;
     private bool _isReaped = false;
     private bool _isTurningBlindEye = false;
@@ -55,15 +64,6 @@ public class AgentCharacter : BasicNavMeshAgent
     private AwarenessBehavior _awarenessBehavior = null;
     private VisionCone _visionCone = null;
     private MeshRenderer _meshRenderer = null;
-
-    public enum AgentState
-    {
-        Wander,
-        Idle,
-        Follow,
-        Dead,
-        Flee
-    }
 
     protected override void Awake()
     {
@@ -166,45 +166,60 @@ public class AgentCharacter : BasicNavMeshAgent
 
     public void UnblindAgent()
     {
-        // This methid is always called at the end of the "Amnesia" ability usage
+        // This method is always called at the end of the "Amnesia" ability usage
         _isTurningBlindEye = false;
         _blindEyeCooldown = _originalBlindEyeCooldown;
     }
 
     void Start()
     {
+        // Get player reference
         _player = GameObject.FindObjectOfType<PlayerCharacter>();
+
+        // Get awareness behavior (resposible for visibilaty action menu above agent)
         _awarenessBehavior = GetComponent<AwarenessBehavior>();
+
+        // Get vision cone component (resonsible for detecting dead agents)
         _visionCone = GetComponent<VisionCone>();
+
+        // Meshrenderer for setting different materials based on state
         _meshRenderer = _visuals.GetComponent<MeshRenderer>();
 
-
+        // Overwrite speed by serializefield
         _agent.speed = _normalSpeed;
 
+        // Agents always start wandering, so we need to calculate a destination
         CalculateWanderDestination();
     }
 
     public void Update()
     {
-        //if (_isReaped)
-        //    Destroy(gameObject);
-
+        // Handle cooldowns of agent
         HandleCoolDowns();
 
+        // See of agent needs to flee or not
         DetermineState();
 
-        OnClosest();
+        // Every agent is resposible for setting if he is interactible
+        // Only player keeps track of closest agent
+        MakeInteractibleIfClosest();
 
+        // Make sure the player exists, otherwise we will get errors
         if (!_player)
             return;
 
-        if (_isMarkedForKilling && _state == AgentState.Dead)
+        // This can only execute once, right after the player has killed an agent
+        if (_isMarkedForKilling)
         {
-            OnDead();
+            OnMarkedForKilling();
         }
-        else if (_state == AgentState.Follow && _player)
+        else if (_state == AgentState.Follow)
         {
+            // Target is what the base class uses to move towards.
+            // When setting this property Seek() will automatically go for this.
             Target = _player.transform.position;
+
+            // overwrite old mats
             _meshRenderer.material = _FollowMaterial;
             _agent.speed = _followSpeed;
 
@@ -232,10 +247,13 @@ public class AgentCharacter : BasicNavMeshAgent
 
     private void DetermineState()
     {
+        // We only want to target wandering agents
         if (_state != AgentState.Flee && _state != AgentState.Dead)
         {
+            // Check if player is in vacinity.
             Collider[] colliders = Physics.OverlapSphere(transform.position, _playerDetectRadius, _playerMask);
 
+            // If player is here and the agent has the urge to run change state
             if (colliders.Length > 0 && CanRunAway)
             {
                 _state = AgentState.Flee;
@@ -244,7 +262,7 @@ public class AgentCharacter : BasicNavMeshAgent
         } 
     }
 
-    private void OnClosest()
+    private void MakeInteractibleIfClosest()
     {
         int myId = GetInstanceID();
         if (_player.ClosestId != myId)
@@ -254,34 +272,35 @@ public class AgentCharacter : BasicNavMeshAgent
         }
     }
 
-    private void OnDead()
+    private void OnMarkedForKilling()
     {
-        // stop agent and mark as dead.
+        // Tell the navmesh agent to stop working
         _agent.isStopped = true;
-        // unlock rotation.
 
-        // set to prevent entering this again
-        _isDead = true;
+        // Set state to dead.
         _state = AgentState.Dead;
 
+        // Set all tags to dead. (Used in vision cone for agents)
         foreach (Transform t in transform)
         {
             t.gameObject.tag = "dead";
         }
-
         gameObject.tag = "dead";
 
         // unmark to prevent looping animation
         _isMarkedForKilling = false;
 
+        // Change material
         _meshRenderer.material = _DeathMaterial;
         
-        // Dead men tell no tales
+        // Make sure the visioncone doesn't self detect
         _visionCone.enabled = false;
         gameObject.GetComponent<NavMeshAgent>().enabled = false;
 
+        // Turn body for extra dead feeling
         transform.Rotate(new Vector3(0f, 0f, 90f));
 
+        // Play a kill particle
         Instantiate(_DeathParticle, transform);
     }
 
@@ -341,16 +360,17 @@ public class AgentCharacter : BasicNavMeshAgent
             CalculateWanderDestination();
         }
 
-        
-
-        _target = _wanderDestination;
+        Target = _wanderDestination;
         base.Seek();
     }
 
     private void CalculateFleeDestination()
     {
+        // Get any position away from the player.
+        // This needs to have a better working implementation later
         Vector3 offset = (_player.transform.position - transform.position).normalized;
 
+        // Actually sample the point and make sure it's on the navmesh.
         NavMeshHit navMeshHit;
         if (NavMesh.SamplePosition(offset * 50f, out navMeshHit, 100f, NavMesh.AllAreas))
         {
@@ -360,6 +380,7 @@ public class AgentCharacter : BasicNavMeshAgent
 
     private void CalculateWanderDestination()
     {
+        // Take a random direction in the unitCircle and set it as a destination.
         Vector2 randomDirection = Random.insideUnitCircle;
         Vector3 randomWanderLocation = new Vector3(
             transform.position.x + randomDirection.x * _wanderDistance,
@@ -367,6 +388,7 @@ public class AgentCharacter : BasicNavMeshAgent
             transform.position.z + randomDirection.y * _wanderDistance
             );
 
+        // Sample position to make sure it's on the navmesh.
         NavMeshHit navMeshHit;
         if (NavMesh.SamplePosition(randomWanderLocation, out navMeshHit, 100f, NavMesh.AllAreas))
         {
@@ -385,6 +407,7 @@ public class AgentCharacter : BasicNavMeshAgent
         // if body is in sight
         if (_visionCone.IsInSight && !_isTurningBlindEye)
         {
+            // NOTE: AwarenessManager will pick up on whether an agent has seen a crime and handle it accordinly.
             _hasSeenCrime = true;
             _isTurningBlindEye = true;
         }

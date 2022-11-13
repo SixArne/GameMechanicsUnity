@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: UltimateDeath
   m_EditorClassIdentifier: 
   upgradeName: Grim poison
-  upgradeDescriptionn: 'The first body you kill wil kill the grim reaper...
-
-    however
-    only one can be found'
+  upgradeDescription: This ability will eliminate all citizins except 1, if you can
+    kill this 1 agent before grim kills you grim will be destroyed forever. (1 use
+    only)
   upgradeCost: 30
   abilityType: 2
   abilityScript: {fileID: 5815163597310305230, guid: e230d476491d42a47b35ed9b68cf6b78, type: 3}

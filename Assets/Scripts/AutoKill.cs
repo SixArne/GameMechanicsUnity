@@ -8,6 +8,7 @@ public class AutoKill : MonoBehaviour
 
     void Awake()
     {
+        // This will kill the object once it's passed it's lifetime
         Invoke("Kill", _lifetime);
     }
 

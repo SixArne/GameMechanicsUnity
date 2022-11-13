@@ -34,14 +34,12 @@ public class GrimReaper : BasicNavMeshAgent
 
     const string _playerTag = "Friendly";
     const string _levelEndMessage = "I EXPECT MORE TOMORROW";
-
-    private float _currentTimer = 0f;
-    private float _speedIncreaseCurrentTimer = 0f;
     private PlayerCharacter _playerCharacter;
 
     private bool _canKillPlayer = true;
     private bool _isGameOver = false;
     private bool _hasPlayedLevelEndAnimation = false;
+    private bool _isCollecting = false;
     private GameObject _deadAgent = null;
     private Gamemode _gamemode = null;
 
@@ -63,21 +61,32 @@ public class GrimReaper : BasicNavMeshAgent
     }
 
     private void Start()
-    {
+    {   
+        // only 1 of each in scene so this way of fetching is fine
         _playerCharacter = GameObject.FindObjectOfType<PlayerCharacter>();
+        if (!_playerCharacter)
+            throw new UnityException("Player script not found");
+
         _sceneManager = GameObject.FindObjectOfType<CustomSceneManager>();
+        if (!_sceneManager)
+            throw new UnityException("Scene manager script not found");
+
         _gamemode = GameObject.FindObjectOfType<Gamemode>();
+        if (!_gamemode)
+            throw new UnityException("Gamemode not found");
+
+        // We need our chatbillboard of our player
         _chatBillBoard = GetComponent<ChatBillboard>();
+        if (!_chatBillBoard)
+            throw new UnityException("Chatbillboard script not found");
+
+        // Increases Hein speed automatically;
+        InvokeRepeating("IncreaseSpeed", _speedIncreaseEveryXSeconds, _speedIncreaseEveryXSeconds);
     }
 
-    private void OnSpeedIncrease()
+    private void IncreaseSpeed()
     {
-        _speedIncreaseCurrentTimer += Time.deltaTime;
-        if (_speedIncreaseCurrentTimer >= _speedIncreaseEveryXSeconds)
-        {
-            _agent.speed += _heinSpeedIncrease;
-            _speedIncreaseCurrentTimer = 0f;
-        }
+        _agent.speed += _heinSpeedIncrease;
     }
 
     private void TeleportToPlayer()
@@ -92,6 +101,7 @@ public class GrimReaper : BasicNavMeshAgent
             playerPos.z + randomDirection.y * wanderDistance
           );
 
+        // Make sure that teleport position is on navmesh
         NavMeshHit navMeshHit;
         if (NavMesh.SamplePosition(randomWanderLocation, out navMeshHit, 100f, NavMesh.AllAreas))
         {
@@ -101,9 +111,6 @@ public class GrimReaper : BasicNavMeshAgent
 
     private void Update()
     {
-        // Increases Hein speed automatically;
-        OnSpeedIncrease();
-
         if (!_playerCharacter)
             return;
 
@@ -137,6 +144,8 @@ public class GrimReaper : BasicNavMeshAgent
     private void CheckTouchPlayer()
     {
         Vector3 transformPosition = _playerCharacter.transform.position - transform.position;
+
+        // If in distance and chasing
         if (transformPosition.sqrMagnitude <= _killRadius * _killRadius && _canKillPlayer && _state == GrimState.Chasing)
         {
             if (!_playerCharacter.HasUsedAbility && _playerCharacter.AbilityData && _playerCharacter.AbilityData.abilityType == SoulUpgradeData.AbilityType.OnDead)
@@ -148,16 +157,19 @@ public class GrimReaper : BasicNavMeshAgent
 
             _canKillPlayer = false;
 
+            // Cleanup player data
             if (_playerCharacter)
             {
                 _playerKillSFX.Play();
                 _playerCharacter.DestroyPlayer();
             }
 
-
             if (!_isGameOver)
+            {
                 Invoke("EndGame", 0.5f);
+            }
 
+            // Put grim in collecting mode to avoid missing player script
             _state = GrimState.Collecting;
         }
     }
@@ -169,35 +181,40 @@ public class GrimReaper : BasicNavMeshAgent
 
     private void CollectSoul()
     {
+        // if no body found skip
         if (!_deadAgent)
+        {
             return;
+        }
 
         float distanceSqr = Vector3.SqrMagnitude(_deadAgent.gameObject.transform.position - transform.position);
 
-        if (distanceSqr <= _collectRadius * _collectRadius)
+        if (distanceSqr <= _collectRadius * _collectRadius && !_isCollecting)
         {
-            _currentTimer += Time.deltaTime;
-
-            if (_currentTimer > _collectDuration)
-            {
-                _state = GrimState.Chasing;
-                _deadAgent.GetComponent<AgentCharacter>().IsReaped = true;
-                _currentTimer = 0f;
-
-                // Make hein bit faster
-                _agent.speed += _heinSpeedIncrease;
-
-                _gamemode.OnAgentCollected();
-
-                Destroy(_deadAgent);
-            }
+            // Invoked function will unset the _isCollecting variable
+            Invoke("CollectBody", _collectDuration);
+            _isCollecting = true;
         }
-        else
+        else if (distanceSqr > _collectRadius * _collectRadius)
         {
             // Set location data.
             Target = _deadAgent.gameObject.transform.position;
             base.Seek();
         }
+    }
+
+    private void CollectBody()
+    {
+        _state = GrimState.Chasing;
+        _deadAgent.GetComponent<AgentCharacter>().IsReaped = true;
+        
+
+        // Make hein bit faster
+        _agent.speed += _heinSpeedIncrease;
+
+        _gamemode.OnAgentCollected();
+        _isCollecting = false;
+        _deadAgent = null;
     }
 
     private void ChaseProtagist()
@@ -206,11 +223,8 @@ public class GrimReaper : BasicNavMeshAgent
         base.Seek();
     }
 
-    protected override void OnDrawGizmos()
+    protected void OnDrawGizmos()
     {
-        // Drawing steering behavior
-        base.OnDrawGizmos();
-
         Gizmos.color = new Color(1, 0, 0, 0.4f);
         Gizmos.DrawSphere(transform.position, _killRadius);
 

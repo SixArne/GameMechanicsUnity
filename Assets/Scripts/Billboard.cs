@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Billboard : MonoBehaviour
 {
-  
+    // Make sure that canvas is always directed towards camera.
     void Update()
     {
         Camera camera = Camera.main;

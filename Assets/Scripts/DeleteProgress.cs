@@ -6,7 +6,7 @@ public class DeleteProgress : MonoBehaviour
 {
     void Start()
     {
-        // Delete old gamemode and remake
+        // Reset gamemode data.
         Gamemode gamemode = GameObject.FindObjectOfType<Gamemode>();
         gamemode.Reset();
     }

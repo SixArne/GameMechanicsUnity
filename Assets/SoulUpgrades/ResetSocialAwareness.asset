@@ -13,11 +13,9 @@ MonoBehaviour:
   m_Name: ResetSocialAwareness
   m_EditorClassIdentifier: 
   upgradeName: Amnesia
-  upgradeDescriptionn: 'This ability activates when the social awareness goes to
-    a severe level.
-
-    This will reset the awareness and make all citizens blind
-    to danger for 30 seconds.'
+  upgradeDescription: This passive ability will trigger once the public awareness
+    is at it's highest. People will forget everything about you and will be blind
+    to any danger for 30 seconds (1 use only)
   upgradeCost: 10
   abilityType: 1
   abilityScript: {fileID: 4074275719689073999, guid: 7605f82ce1c38fd4dafbc0fc263fb440, type: 3}

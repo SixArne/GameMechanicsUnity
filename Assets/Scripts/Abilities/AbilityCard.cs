@@ -3,39 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// AbilityCard will fill in the data from a scriptable object
+/// </summary>
 public class AbilityCard : MonoBehaviour
 {
     [SerializeField] private TMPro.TMP_Text _title;
     [SerializeField] private TMPro.TMP_Text _description;
     [SerializeField] private TMPro.TMP_Text _cost;
     [SerializeField] private Button _button;
-    private BasicAbility _ability;
+    private SoulUpgradeData _abilityData;
 
     private bool _isSelected = false;
-    private int _abilityIndex = 0;
 
     public bool IsSelected
     {
         get => _isSelected;
     }
 
-    public int AbilityIndex
+    public SoulUpgradeData AbilityData
     {
-        get => _abilityIndex;
+        get => _abilityData;
     }
 
-    public void SetData(string title, string description, string cost, BasicAbility ability, int abilityIndex)
+    public void SetData(SoulUpgradeData data)
     {
-        _title.text = title;
-        _description.text = description;
-        _cost.text = cost;
-        _ability = ability;
-        _abilityIndex = abilityIndex;
+        _title.text = data.upgradeName;
+        _description.text = data.upgradeDescription;
+        _cost.text = data.upgradeCost.ToString();
+
+        _abilityData = data;
     }
 
     public void Select()
     {
-        Debug.Log("Selected");
         _isSelected = true;
     }
 
